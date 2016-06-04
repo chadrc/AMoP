@@ -10,10 +10,9 @@ public class BoardNodeBehavior : MonoBehaviour
     {
         DetachFromNode();
 
-        Vector3 pos = node.Position;
         // 2.5 is the center of 6 unit spheres
         // subtract it from all nodes to center board on screen
-        pos.x -= 2.5f;
+        Vector3 pos = node.Position - new Vector3(2.5f, 2.5f, 2.5f);
         transform.position = pos;
 
         node.Affiliation.Changed += OnNodeAffiliationChanged;
