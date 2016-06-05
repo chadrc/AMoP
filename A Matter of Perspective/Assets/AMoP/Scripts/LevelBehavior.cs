@@ -57,13 +57,29 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeButtonUp(NodeButtonBehavior button)
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
         if (selectedNode != null)
         {
+            BoardNode node = board.GetNode(button.XIndex, button.YIndex);
             selectedNode.Behavior.Deselect();
             if (selectedNode == node)
             {
                 selectedNode.Behavior.Highlight();
+            }
+            else if (node != null)
+            {
+                // Figure direction of swipe
+                var sNodePos = selectedNode.Behavior.transform.position;
+                var nodePos = node.Behavior.transform.position;
+                Vector2 dir = MathUtils.ClosestCardinal(nodePos - sNodePos);
+                // Find node in that direction of selectedNode
+                BoardNode adjacentNode = board.GetNode(
+                    (int)(selectedNode.Behavior.transform.position.x + 2.5f + dir.x), 
+                    (int)(selectedNode.Behavior.transform.position.y + 2.5f + dir.y));
+                if (adjacentNode != null)
+                {
+                    // Perform energy transfer
+                    BoardNode.TransferEnergy(selectedNode, adjacentNode);
+                }
             }
             selectedNode = null;
         }

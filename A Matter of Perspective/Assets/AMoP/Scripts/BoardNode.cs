@@ -26,17 +26,6 @@ public class BoardNode
         DetachFromBehavior();
     }
 
-    /// <summary>
-    /// Reduces energy by (int)energy.
-    /// </summary>
-    /// <returns>Returns amount of energy as int.</returns>
-    public int Drain()
-    {
-        int amount = (int)Energy;
-        Energy.Value -= amount;
-        return amount;
-    }
-
     public void SetBoard(Board board)
     {
         ParentBoard = board;
@@ -78,4 +67,20 @@ public class BoardNode
     {
 
     }
+
+    #region Static
+
+    public static void TransferEnergy(BoardNode from, BoardNode to)
+    {
+        int energy = (int)from.Energy.Value;
+        from.Energy.Value -= energy;
+        float willBe = to.Energy.Value + energy;
+        if (willBe > 20.0f)
+        {
+            willBe = 20.0f;
+        }
+        to.Energy.Value = willBe;
+    }
+
+    #endregion
 }
