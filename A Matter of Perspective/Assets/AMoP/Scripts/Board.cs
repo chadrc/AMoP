@@ -14,12 +14,16 @@ public class Board
             return new List<BoardNode>(nodes);
         }
     }
+    public BoardBehavior Behavior { get; private set; }
 
-    public Board(BoardData data, BoardNodeFactory nodeFactory)
+    public Board(BoardData data, BoardBehavior behavior, BoardNodeFactory nodeFactory)
     {
+        Behavior = behavior;
         foreach (var nodeData in data.Nodes)
         {
-            nodes.Add(nodeFactory.CreateNode(nodeData));
+            BoardNode node = nodeFactory.CreateNode(nodeData);
+            node.Behavior.transform.SetParent(behavior.transform);
+            nodes.Add(node);
         }
     }
 }

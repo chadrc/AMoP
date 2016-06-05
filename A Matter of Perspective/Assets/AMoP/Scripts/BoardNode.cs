@@ -3,9 +3,9 @@ using System.Collections;
 
 public class BoardNode
 {
-    private BoardNodeBehavior behavior;
     private Coroutine updateRoutine;
     
+    public BoardNodeBehavior Behavior { get; private set; }
     public Property<Vector3> Position { get; private set; }
     public Property<BoardNodeType> Type { get; private set; }
     public Property<BoardNodeAffiliation> Affiliation { get; private set; }
@@ -28,20 +28,21 @@ public class BoardNode
     {
         DetachFromBehavior();
 
+        Behavior = behavior;
         behavior.EnergyEnter += OnEnergyEnter;
         updateRoutine = behavior.StartCoroutine(UpdateRoutine());
     }
 
     public void DetachFromBehavior()
     {
-        if (behavior == null)
+        if (Behavior == null)
         {
             return;
         }
 
-        behavior.EnergyEnter -= OnEnergyEnter;
-        behavior.StopCoroutine(updateRoutine);
-        behavior = null;
+        Behavior.EnergyEnter -= OnEnergyEnter;
+        Behavior.StopCoroutine(updateRoutine);
+        Behavior = null;
     }
 
     private IEnumerator UpdateRoutine()

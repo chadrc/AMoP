@@ -9,18 +9,7 @@ public class BoardGenerator
     {
         this.data = data;
     }
-
-    public Board Generate(BoardNodeFactory nodeFactory)
-    {
-        if (data == null)
-        {
-            throw new NoBoardDataException();
-        }
-
-        Board board = new Board(data, nodeFactory);
-
-        return board;
-    }
+    
 }
 
 public class NoBoardDataException : System.InvalidOperationException

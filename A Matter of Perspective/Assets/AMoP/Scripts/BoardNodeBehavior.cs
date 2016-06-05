@@ -2,7 +2,7 @@
 
 public class BoardNodeBehavior : MonoBehaviour
 {
-    private BoardNode node;
+    public BoardNode Node { get; private set; }
     
     public event System.Action<int> EnergyEnter;
 
@@ -22,14 +22,14 @@ public class BoardNodeBehavior : MonoBehaviour
 
     public void DetachFromNode()
     {
-        if (node == null)
+        if (Node == null)
         {
             return;
         }
 
-        node.Affiliation.Changed -= OnNodeAffiliationChanged;
-        node.Type.Changed -= OnNodeTypeChanged;
-        node.Energy.Changed -= OnNodeEnergyChanged;
+        Node.Affiliation.Changed -= OnNodeAffiliationChanged;
+        Node.Type.Changed -= OnNodeTypeChanged;
+        Node.Energy.Changed -= OnNodeEnergyChanged;
     }
 
     private void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)

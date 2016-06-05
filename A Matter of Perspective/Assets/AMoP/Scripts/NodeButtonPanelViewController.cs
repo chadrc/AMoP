@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System;
 
-public class NodeButtonPanelViewController : MonoBehaviour
+public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField]
     private GameObject nodeButtonPrefab;
     
-    // Sends x and y index of button pressed
-    public event System.Action<NodeButtonBehavior> NodeButtonPointerDown;
-    // Sends direction from original press in closest cardinal
-    public event System.Action<NodeButtonBehavior> NodeButtonPointerUp;
+    public event Action<NodeButtonBehavior> NodeButtonPointerDown;
+    public event Action<NodeButtonBehavior> NodeButtonPointerUp;
+
+    // Sends cardinal direction of swipe;
+    public event Action<Vector2> SwipeOccurred;
 
     private List<NodeButtonBehavior> nodeButtons = new List<NodeButtonBehavior>();
     private NodeButtonBehavior lastEnter;
@@ -17,6 +20,9 @@ public class NodeButtonPanelViewController : MonoBehaviour
     // TODO: Refactor out resize checking into separate behavior with event 
     private int InitialScreenWidth;
     private int InitialScreenHeight;
+
+    // Swipe Calculation Variables
+    private Vector2 pointDown;
 
 	// Use this for initialization
 	void Start ()
@@ -91,5 +97,50 @@ public class NodeButtonPanelViewController : MonoBehaviour
 
         behavior.Init(this, x, y);
         nodeButtons.Add(behavior);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        pointDown = eventData.position;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        Vector2 dif = eventData.position - pointDown;
+        if (dif.magnitude < 1.0f)
+        {
+            // Ignore if didn't swipe far enough
+            return;
+        }
+
+        float angle = Vector2.Angle(Vector2.right, dif);
+        if (eventData.position.y < pointDown.y)
+        {
+            angle = 360 - angle;
+        }
+
+        Vector2 cardinal;
+
+        if (angle >= 45 && angle < 135)
+        {
+            cardinal = Vector2.up;
+        }
+        else if (angle >= 135 && angle < 225)
+        {
+            cardinal = Vector3.left;
+        }
+        else if (angle >= 225 && angle < 315)
+        {
+            cardinal = Vector3.down;
+        }
+        else
+        {
+            cardinal = Vector3.right;
+        }
+
+        if (SwipeOccurred != null)
+        {
+            SwipeOccurred(cardinal);
+        }
     }
 }
