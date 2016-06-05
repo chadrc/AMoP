@@ -1,5 +1,5 @@
 ﻿
-public struct Property<T>
+public class Property<T>
 {
     private T value;
     public event System.Action<T> Changed;

@@ -26,4 +26,33 @@ public class Board
             nodes.Add(node);
         }
     }
+
+    public BoardNode GetNode(int x, int y)
+    {
+        float posX = x - 2.5f;
+        float posY = y - 2.5f;
+        
+        List<BoardNode> xyNodes = new List<BoardNode>();
+        foreach (var node in Nodes)
+        {
+            // Check for position in 1 unit range to account for float errors
+            if (node.Behavior.transform.position.x > posX - .5f && node.Behavior.transform.position.x < posX + .5f &&
+                node.Behavior.transform.position.y > posY - .5f && node.Behavior.transform.position.y < posY + .5f)
+            {
+                xyNodes.Add(node);
+            }
+        }
+
+        BoardNode matchNode = null;
+
+        foreach (var node in xyNodes)
+        {
+            if (matchNode == null || matchNode.Behavior.transform.position.z > node.Behavior.transform.position.z)
+            {
+                matchNode = node;
+            }
+        }
+
+        return matchNode;
+    }
 }

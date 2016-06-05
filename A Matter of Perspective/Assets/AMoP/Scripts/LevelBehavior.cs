@@ -17,6 +17,7 @@ public class LevelBehavior : MonoBehaviour
 
     private Board board;
     private bool canSwipe = true;
+    private BoardNode selectedNode;
 
 	// Use this for initialization
 	void Start ()
@@ -36,12 +37,21 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeButtonDown(NodeButtonBehavior button)
     {
-        Debug.Log(button.XIndex + ", " + button.YIndex);
+        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        if (node != null)
+        {
+            node.Behavior.Select();
+            selectedNode = node;
+        }
     }
 
     void OnNodeButtonUp(NodeButtonBehavior button)
     {
-        Debug.Log(button.XIndex + ", " + button.YIndex);
+        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        if (selectedNode != null)
+        {
+            selectedNode.Behavior.Deselect();
+        }
     }
 
     void OnSwipeOccurred(Vector2 dir)
@@ -58,7 +68,7 @@ public class LevelBehavior : MonoBehaviour
         float spinTime = .25f;
         float t = 0;
         Quaternion startRot = board.Behavior.transform.rotation;
-        board.Behavior.transform.Rotate(Vector3.up, 90f * dir.x, Space.World);
+        board.Behavior.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
         board.Behavior.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
         Quaternion endRot = board.Behavior.transform.rotation;
         board.Behavior.transform.rotation = startRot;

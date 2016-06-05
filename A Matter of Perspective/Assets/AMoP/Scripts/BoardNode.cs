@@ -6,6 +6,7 @@ public class BoardNode
     private Coroutine updateRoutine;
     
     public BoardNodeBehavior Behavior { get; private set; }
+
     public Property<Vector3> Position { get; private set; }
     public Property<BoardNodeType> Type { get; private set; }
     public Property<BoardNodeAffiliation> Affiliation { get; private set; }
@@ -22,6 +23,17 @@ public class BoardNode
     ~BoardNode()
     {
         DetachFromBehavior();
+    }
+
+    /// <summary>
+    /// Reduces energy by (int)energy.
+    /// </summary>
+    /// <returns>Returns amount of energy as int.</returns>
+    public int Drain()
+    {
+        int amount = (int)Energy;
+        Energy.Value -= amount;
+        return amount;
     }
 
     public void AttachedToBehavior(BoardNodeBehavior behavior)
@@ -50,8 +62,6 @@ public class BoardNode
         while(true)
         {
             // Update Node
-
-
 
             yield return new WaitForEndOfFrame();
         }

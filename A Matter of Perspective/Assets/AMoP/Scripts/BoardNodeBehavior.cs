@@ -6,6 +6,16 @@ public class BoardNodeBehavior : MonoBehaviour
     
     public event System.Action<int> EnergyEnter;
 
+    public void Select()
+    {
+        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.red;
+    }
+
+    public void Deselect()
+    {
+        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
+    }
+
     public void AttachToNode(BoardNode node)
     {
         DetachFromNode();
