@@ -27,6 +27,8 @@ public class LevelBehavior : MonoBehaviour
         board = new Board(boardData, boardBehavior, boardNodeFactory);
         buttonController.NodeButtonPointerDown += OnNodeButtonDown;
         buttonController.NodeButtonPointerUp += OnNodeButtonUp;
+        buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
+        buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
 	}
 
@@ -34,6 +36,8 @@ public class LevelBehavior : MonoBehaviour
     {
         buttonController.NodeButtonPointerDown -= OnNodeButtonDown;
         buttonController.NodeButtonPointerUp -= OnNodeButtonUp;
+        buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
+        buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
         buttonController.SwipeOccurred -= OnSwipeOccurred;
     }
 
@@ -57,6 +61,10 @@ public class LevelBehavior : MonoBehaviour
         if (selectedNode != null)
         {
             selectedNode.Behavior.Deselect();
+            if (selectedNode == node)
+            {
+                selectedNode.Behavior.Highlight();
+            }
             selectedNode = null;
         }
         else if (downButton != null)
@@ -64,6 +72,24 @@ public class LevelBehavior : MonoBehaviour
             Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
             board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
             downButton = null;
+        }
+    }
+
+    void OnNodeButtonEnter(NodeButtonBehavior button)
+    {
+        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        if (node != null && node != selectedNode)
+        {
+            node.Behavior.Highlight();
+        }
+    }
+
+    void OnNodeButtonExit(NodeButtonBehavior button)
+    {
+        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        if (node != null && node != selectedNode)
+        {
+            node.Behavior.Unhighlight();
         }
     }
 

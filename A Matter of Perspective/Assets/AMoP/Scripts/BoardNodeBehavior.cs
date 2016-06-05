@@ -16,6 +16,16 @@ public class BoardNodeBehavior : MonoBehaviour
         transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
     }
 
+    public void Highlight()
+    {
+        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.green;
+    }
+
+    public void Unhighlight()
+    {
+        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
+    }
+
     public void AttachToNode(BoardNode node)
     {
         DetachFromNode();

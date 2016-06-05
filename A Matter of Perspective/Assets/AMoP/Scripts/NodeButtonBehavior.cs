@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using System;
 
-public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler
+public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public NodeButtonPanelViewController Controller { get; private set; }
     public int XIndex { get; private set; }
@@ -21,13 +21,18 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
         Controller.ButtonDown(this);
     }
 
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        Controller.ButtonUp(this);
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         Controller.ButtonEnter(this);
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public void OnPointerExit(PointerEventData eventData)
     {
-        Controller.ButtonUp(this);
+        Controller.ButtonExit(this);
     }
 }

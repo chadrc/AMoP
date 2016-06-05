@@ -10,6 +10,8 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     
     public event Action<NodeButtonBehavior> NodeButtonPointerDown;
     public event Action<NodeButtonBehavior> NodeButtonPointerUp;
+    public event Action<NodeButtonBehavior> NodeButtonPointerEnter;
+    public event Action<NodeButtonBehavior> NodeButtonPointerExit;
 
     // Sends cardinal direction of swipe;
     public event Action<Vector2> SwipeOccurred;
@@ -24,8 +26,8 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     // Swipe Calculation Variables
     private Vector2 pointDown;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         initialize();
     }
@@ -53,11 +55,6 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         lastEnter = button;
     }
 
-    public void ButtonEnter(NodeButtonBehavior button)
-    {
-        lastEnter = button;
-    }
-
     public void ButtonUp(NodeButtonBehavior button)
     {
         if (lastEnter != null && NodeButtonPointerUp != null)
@@ -65,6 +62,28 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             NodeButtonPointerUp(lastEnter);
         }
         lastEnter = null;
+    }
+
+    public void ButtonEnter(NodeButtonBehavior button)
+    {
+        lastEnter = button;
+        if (NodeButtonPointerEnter != null)
+        {
+            NodeButtonPointerEnter(button);
+        }
+    }
+
+    public void ButtonExit(NodeButtonBehavior button)
+    {
+        if (lastEnter == button)
+        {
+            lastEnter = null;
+        }
+
+        if (NodeButtonPointerExit != null)
+        {
+            NodeButtonPointerExit(button);
+        }
     }
 
     private void initialize()
