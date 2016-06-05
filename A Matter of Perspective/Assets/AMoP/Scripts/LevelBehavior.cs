@@ -19,6 +19,8 @@ public class LevelBehavior : MonoBehaviour
     private bool canSwipe = true;
     private BoardNode selectedNode;
 
+    private NodeButtonBehavior downButton;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -43,6 +45,10 @@ public class LevelBehavior : MonoBehaviour
             node.Behavior.Select();
             selectedNode = node;
         }
+        else
+        {
+            downButton = button;
+        }
     }
 
     void OnNodeButtonUp(NodeButtonBehavior button)
@@ -51,6 +57,13 @@ public class LevelBehavior : MonoBehaviour
         if (selectedNode != null)
         {
             selectedNode.Behavior.Deselect();
+            selectedNode = null;
+        }
+        else if (downButton != null)
+        {
+            Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
+            board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
+            downButton = null;
         }
     }
 

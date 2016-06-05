@@ -113,30 +113,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             return;
         }
 
-        float angle = Vector2.Angle(Vector2.right, dif);
-        if (eventData.position.y < pointDown.y)
-        {
-            angle = 360 - angle;
-        }
-
-        Vector2 cardinal;
-
-        if (angle >= 45 && angle < 135)
-        {
-            cardinal = Vector2.up;
-        }
-        else if (angle >= 135 && angle < 225)
-        {
-            cardinal = Vector3.left;
-        }
-        else if (angle >= 225 && angle < 315)
-        {
-            cardinal = Vector3.down;
-        }
-        else
-        {
-            cardinal = Vector3.right;
-        }
+        Vector2 cardinal = MathUtils.ClosestCardinal(dif);
 
         if (SwipeOccurred != null)
         {
