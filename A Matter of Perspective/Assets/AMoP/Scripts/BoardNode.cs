@@ -6,6 +6,7 @@ public class BoardNode
     private Coroutine updateRoutine;
     
     public BoardNodeBehavior Behavior { get; private set; }
+    public Board ParentBoard { get; private set; }
 
     public Property<Vector3> Position { get; private set; }
     public Property<BoardNodeType> Type { get; private set; }
@@ -34,6 +35,12 @@ public class BoardNode
         int amount = (int)Energy;
         Energy.Value -= amount;
         return amount;
+    }
+
+    public void SetBoard(Board board)
+    {
+        ParentBoard = board;
+        Behavior.transform.SetParent(board.Behavior.transform);
     }
 
     public void AttachedToBehavior(BoardNodeBehavior behavior)

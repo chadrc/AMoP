@@ -22,7 +22,7 @@ public class Board
         foreach (var nodeData in data.Nodes)
         {
             BoardNode node = nodeFactory.CreateNode(nodeData);
-            node.Behavior.transform.SetParent(behavior.transform);
+            node.SetBoard(this);
             nodes.Add(node);
         }
     }

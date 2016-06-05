@@ -56,32 +56,6 @@ public class LevelBehavior : MonoBehaviour
 
     void OnSwipeOccurred(Vector2 dir)
     {
-        if (canSwipe)
-        {
-            StartCoroutine(boardSpin(dir));
-        }
-    }
-
-    IEnumerator boardSpin(Vector2 dir)
-    {
-        canSwipe = false;
-        float spinTime = .25f;
-        float t = 0;
-        Quaternion startRot = board.Behavior.transform.rotation;
-        board.Behavior.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
-        board.Behavior.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
-        Quaternion endRot = board.Behavior.transform.rotation;
-        board.Behavior.transform.rotation = startRot;
-
-        while (t < spinTime)
-        {
-            t += Time.deltaTime;
-            float frac = Mathf.Clamp01(t / spinTime);
-            board.Behavior.transform.rotation = Quaternion.Slerp(startRot, endRot, frac);
-
-            yield return new WaitForEndOfFrame();
-        }
-
-        canSwipe = true;
+        board.Behavior.Spin(dir);
     }
 }
