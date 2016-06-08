@@ -46,25 +46,30 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
-    public void ButtonDown(NodeButtonBehavior button)
+    public void ButtonDown(NodeButtonBehavior button, PointerEventData eventData)
     {
         if (NodeButtonPointerDown != null)
         {
             NodeButtonPointerDown(button);
         }
+        pointDown = eventData.position;
         lastEnter = button;
     }
 
-    public void ButtonUp(NodeButtonBehavior button)
+    public void ButtonUp(NodeButtonBehavior button, PointerEventData eventData)
     {
         if (lastEnter != null && NodeButtonPointerUp != null)
         {
             NodeButtonPointerUp(lastEnter);
         }
+        else
+        {
+            RaiseSwipeOccurred(eventData);
+        }
         lastEnter = null;
     }
 
-    public void ButtonEnter(NodeButtonBehavior button)
+    public void ButtonEnter(NodeButtonBehavior button, PointerEventData eventData)
     {
         lastEnter = button;
         if (NodeButtonPointerEnter != null)
@@ -73,7 +78,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
-    public void ButtonExit(NodeButtonBehavior button)
+    public void ButtonExit(NodeButtonBehavior button, PointerEventData eventData)
     {
         if (lastEnter == button)
         {
@@ -124,6 +129,11 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     }
 
     public void OnPointerUp(PointerEventData eventData)
+    {
+        RaiseSwipeOccurred(eventData);
+    }
+
+    private void RaiseSwipeOccurred(PointerEventData eventData)
     {
         Vector2 dif = eventData.position - pointDown;
         if (dif.magnitude < 1.0f)

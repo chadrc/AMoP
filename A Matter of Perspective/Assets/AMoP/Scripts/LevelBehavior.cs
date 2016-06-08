@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class LevelBehavior : MonoBehaviour
@@ -30,6 +31,7 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
+        board.Behavior.SpinEnd += OnSpinEnd;
 	}
 
     void OnDestroy()
@@ -39,6 +41,7 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
         buttonController.SwipeOccurred -= OnSwipeOccurred;
+        board.Behavior.SpinEnd -= OnSpinEnd;
     }
 
     void OnNodeButtonDown(NodeButtonBehavior button)
@@ -112,5 +115,13 @@ public class LevelBehavior : MonoBehaviour
     void OnSwipeOccurred(Vector2 dir)
     {
         board.Behavior.Spin(dir);
+    }
+
+    void OnSpinEnd()
+    {
+        foreach (var node in board)
+        {
+            node.Behavior.Unhighlight();
+        }
     }
 }

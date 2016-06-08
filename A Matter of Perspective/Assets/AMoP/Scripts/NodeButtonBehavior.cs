@@ -18,21 +18,21 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Controller.ButtonDown(this);
+        Controller.ButtonDown(this, eventData);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Controller.ButtonUp(this);
+        Controller.ButtonUp(this, eventData);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Controller.ButtonEnter(this);
+        Controller.ButtonEnter(this, eventData);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Controller.ButtonExit(this);
+        Controller.ButtonExit(this, eventData);
     }
 }

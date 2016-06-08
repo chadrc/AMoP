@@ -45,6 +45,7 @@ public class BoardNodeBehavior : MonoBehaviour
         node.Affiliation.Changed += OnNodeAffiliationChanged;
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
+        node.EnergyTransfered += OnEnergyTransfered;
         Resize();
     }
 
@@ -73,6 +74,11 @@ public class BoardNodeBehavior : MonoBehaviour
     private void OnNodeEnergyChanged(float energy)
     {
         Resize();
+    }
+
+    private void OnEnergyTransfered(BoardNode to, int amount)
+    {
+
     }
 
     private void Resize()

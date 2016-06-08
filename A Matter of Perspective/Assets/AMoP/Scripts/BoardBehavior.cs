@@ -4,6 +4,7 @@ using System.Collections;
 public class BoardBehavior : MonoBehaviour {
     private bool canSpin = true;
 
+    public event System.Action SpinEnd;
     public Board BoardObject { get; private set; }
 
     public void Init(Board board)
@@ -40,5 +41,9 @@ public class BoardBehavior : MonoBehaviour {
         }
 
         canSpin = true;
+        if (SpinEnd != null)
+        {
+            SpinEnd();
+        }
     }
 }

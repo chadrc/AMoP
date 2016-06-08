@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.Collections;
 
-public class Board
+public class Board : IEnumerable<BoardNode>
 {
     private List<BoardNode> nodes = new List<BoardNode>();
 
@@ -54,5 +56,15 @@ public class Board
         }
 
         return matchNode;
+    }
+
+    public IEnumerator<BoardNode> GetEnumerator()
+    {
+        return nodes.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

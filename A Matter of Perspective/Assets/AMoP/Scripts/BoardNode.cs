@@ -3,6 +3,9 @@ using System.Collections;
 
 public class BoardNode
 {
+    // Params: to, from, amount
+    public event System.Action<BoardNode, int> EnergyTransfered;
+
     private Coroutine updateRoutine;
     
     public BoardNodeBehavior Behavior { get; private set; }
@@ -80,6 +83,11 @@ public class BoardNode
             willBe = 20.0f;
         }
         to.Energy.Value = willBe;
+
+        if (from.EnergyTransfered != null)
+        {
+           from.EnergyTransfered(to, energy);
+        }
     }
 
     #endregion
