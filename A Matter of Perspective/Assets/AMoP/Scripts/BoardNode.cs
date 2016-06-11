@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BoardNode
 {
-    // Params: to, from, amount
+    // Params: to, amount
     public event System.Action<BoardNode, int> EnergyTransfered;
 
     private Coroutine updateRoutine;

@@ -4,6 +4,8 @@ using System.Collections;
 
 public class LevelBehavior : MonoBehaviour
 {
+    public static LevelBehavior current;
+
     [SerializeField]
     private BoardBehavior boardBehavior;
 
@@ -14,24 +16,32 @@ public class LevelBehavior : MonoBehaviour
     private BoardNodeFactory boardNodeFactory;
 
     [SerializeField]
+    private EnergyFactory energyFactory;
+
+    [SerializeField]
     private NodeButtonPanelViewController buttonController;
 
     private Board board;
     private bool canSwipe = true;
     private BoardNode selectedNode;
+    private EnergyPoolManager energyPoolManager;
 
     private NodeButtonBehavior downButton;
 
 	// Use this for initialization
 	void Start ()
     {
+        energyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
+
+
+
+        board.Behavior.SpinEnd += OnSpinEnd;
         buttonController.NodeButtonPointerDown += OnNodeButtonDown;
         buttonController.NodeButtonPointerUp += OnNodeButtonUp;
         buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
-        board.Behavior.SpinEnd += OnSpinEnd;
 	}
 
     void OnDestroy()
