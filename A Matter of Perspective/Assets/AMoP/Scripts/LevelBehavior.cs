@@ -137,9 +137,6 @@ public class LevelBehavior : MonoBehaviour
 
     void OnSpinEnd()
     {
-        foreach (var node in board)
-        {
-            // Hide all buttons
-        }
+        // Hide all node buttons
     }
 }

@@ -14,24 +14,19 @@ public class BoardNodeBehavior : MonoBehaviour
     private Vector3 minScale = new Vector3(.25f, .25f, .25f);
     private Vector3 maxScale = new Vector3(.75f, .75f, .75f);
 
-    public void Select()
+    public void HalfFade()
     {
-        //renderer.material.color = Color.red;
+        setRendererAlpha(.5f);
     }
 
-    public void Deselect()
+    public void FullFade()
     {
-        //renderer.material.color = Color.white;
+        setRendererAlpha(0);
     }
 
-    public void Highlight()
+    public void NoFade()
     {
-        //renderer.material.color = Color.green;
-    }
-
-    public void Unhighlight()
-    {
-        //renderer.material.color = Color.white;
+        setRendererAlpha(1.0f);
     }
 
     public void AttachToNode(BoardNode node)
@@ -61,6 +56,13 @@ public class BoardNodeBehavior : MonoBehaviour
         Node.Affiliation.Changed -= OnNodeAffiliationChanged;
         Node.Type.Changed -= OnNodeTypeChanged;
         Node.Energy.Changed -= OnNodeEnergyChanged;
+    }
+
+    private void setRendererAlpha(float a)
+    {
+        var clr = renderer.material.color;
+        clr.a = a;
+        renderer.material.color = clr;
     }
 
     private void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)

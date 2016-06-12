@@ -10,13 +10,39 @@ public class BoardBehavior : MonoBehaviour {
     public void Init(Board board)
     {
         BoardObject = board;
+        HideShowNodes();
     }
 
     public void Spin(Vector2 dir)
     {
         if (canSpin)
         {
+            foreach (var node in BoardObject)
+            {
+                node.Behavior.HalfFade();
+            }
             StartCoroutine(boardSpin(dir));
+        }
+    }
+
+    private void HideShowNodes()
+    {
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                var boardRow = BoardObject.GetNodeRow(i, j);
+                if (boardRow.Closest != null)
+                {
+                    boardRow.Closest.Behavior.NoFade();
+                }
+
+                foreach (var node in boardRow.Hidden)
+                {
+                    node.Behavior.FullFade();
+                }
+            }
         }
     }
 
@@ -39,6 +65,8 @@ public class BoardBehavior : MonoBehaviour {
 
             yield return new WaitForEndOfFrame();
         }
+
+        HideShowNodes();
 
         canSpin = true;
         if (SpinEnd != null)

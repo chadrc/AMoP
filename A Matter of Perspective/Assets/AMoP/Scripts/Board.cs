@@ -27,13 +27,24 @@ public class Board : IEnumerable<BoardNode>
             node.SetBoard(this);
             nodes.Add(node);
         }
+        behavior.Init(this);
     }
 
     public BoardNode GetNode(int x, int y)
     {
+        return GetNodeRow(x, y).Closest;
+    }
+
+    public List<BoardNode> GetNotNodes(int x, int y)
+    {
+        return GetNodeRow(x, y).Hidden;
+    }
+
+    public NodeRow GetNodeRow(int x, int y)
+    {
         float posX = x - 2.5f;
         float posY = y - 2.5f;
-        
+
         List<BoardNode> xyNodes = new List<BoardNode>();
         foreach (var node in Nodes)
         {
@@ -55,7 +66,12 @@ public class Board : IEnumerable<BoardNode>
             }
         }
 
-        return matchNode;
+        if (matchNode != null)
+        {
+            xyNodes.Remove(matchNode);
+        }
+
+        return new NodeRow(matchNode, xyNodes);
     }
 
     public IEnumerator<BoardNode> GetEnumerator()
@@ -66,5 +82,17 @@ public class Board : IEnumerable<BoardNode>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+}
+
+public class NodeRow
+{
+    public readonly BoardNode Closest;
+    public readonly List<BoardNode> Hidden;
+
+    public NodeRow(BoardNode closest, List<BoardNode> hidden)
+    {
+        Closest = closest;
+        Hidden = hidden;
     }
 }
