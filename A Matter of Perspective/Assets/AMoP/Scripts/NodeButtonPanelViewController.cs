@@ -106,19 +106,12 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private void createButton(int x, int y)
     {
-        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - 2.5f, y - 2.5f, 0));
         var btnObj = GameObject.Instantiate(nodeButtonPrefab) as GameObject;
         var behavior = btnObj.GetComponent<NodeButtonBehavior>();
-
         btnObj.transform.SetParent(transform);
         btnObj.transform.localScale = Vector3.one;
-        var rectTransform = btnObj.transform as RectTransform;
-        float heightRatio = 1.0f / (Camera.main.orthographicSize * 2);
-        float pixelHeight = Screen.height * heightRatio;
-        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
-        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
-        rectTransform.anchoredPosition = pos;
-
+        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - 2.5f, y - 2.5f, 0));
+        (btnObj.transform as RectTransform).anchoredPosition = pos;
         behavior.Init(this, x, y);
         nodeButtons.Add(behavior);
     }

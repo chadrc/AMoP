@@ -1,19 +1,66 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections;
-using System;
+using UnityEngine.UI;
 
 public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
+    [SerializeField]
+    private Image graphic;
+
     public NodeButtonPanelViewController Controller { get; private set; }
     public int XIndex { get; private set; }
     public int YIndex { get; private set; }
+
+    private CanvasGroup canvasGroup;
+
+    void Awake()
+    {
+        canvasGroup = GetComponent<CanvasGroup>();
+    }
 
     public void Init(NodeButtonPanelViewController controller, int xIndex, int yIndex)
     {
         Controller = controller;
         XIndex = xIndex;
         YIndex = yIndex;
+
+        var rectTransform = graphic.transform as RectTransform;
+        float heightRatio = 1.0f / (Camera.main.orthographicSize * 2);
+        float pixelHeight = Screen.height * heightRatio;
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
+    }
+
+    private void Show()
+    {
+        canvasGroup.alpha = 1.0f;
+    }
+
+    private void Hide()
+    {
+        canvasGroup.alpha = 0;
+    }
+
+    public void Select()
+    {
+        graphic.color = new Color(0, 1.0f, 0, .5f);
+        Show();
+    }
+
+    public void Deselect()
+    {
+        Hide();
+    }
+
+    public void Hover()
+    {
+        graphic.color = new Color(1.0f, 0, 1.0f, .5f);
+        Show();
+    }
+
+    public void Unhover()
+    {
+        Hide();
     }
 
     public void OnPointerDown(PointerEventData eventData)

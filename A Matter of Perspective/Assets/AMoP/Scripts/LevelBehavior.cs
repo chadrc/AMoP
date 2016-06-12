@@ -65,13 +65,10 @@ public class LevelBehavior : MonoBehaviour
     void OnNodeButtonDown(NodeButtonBehavior button)
     {
         BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null)
+        if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player)
         {
-            node.Behavior.Select();
+            button.Select();
             selectedNode = node;
-        }
-        else
-        {
             downButton = button;
         }
     }
@@ -81,10 +78,12 @@ public class LevelBehavior : MonoBehaviour
         if (selectedNode != null)
         {
             BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-            selectedNode.Behavior.Deselect();
+            // Hide selected node
+            downButton.Deselect();
+            // Keep hovered node highlighted after pointer up
             if (selectedNode == node)
             {
-                selectedNode.Behavior.Highlight();
+                downButton.Hover();
             }
             else if (node != null)
             {
@@ -108,6 +107,7 @@ public class LevelBehavior : MonoBehaviour
         {
             Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
             board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
+            downButton.Deselect();
             downButton = null;
         }
     }
@@ -115,9 +115,9 @@ public class LevelBehavior : MonoBehaviour
     void OnNodeButtonEnter(NodeButtonBehavior button)
     {
         BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node != selectedNode)
+        if (node != null && (selectedNode != null || node.Affiliation.Value == BoardNodeAffiliation.Player) && node != selectedNode)
         {
-            node.Behavior.Highlight();
+            button.Hover();
         }
     }
 
@@ -126,7 +126,7 @@ public class LevelBehavior : MonoBehaviour
         BoardNode node = board.GetNode(button.XIndex, button.YIndex);
         if (node != null && node != selectedNode)
         {
-            node.Behavior.Unhighlight();
+            button.Unhover();
         }
     }
 
@@ -139,7 +139,7 @@ public class LevelBehavior : MonoBehaviour
     {
         foreach (var node in board)
         {
-            node.Behavior.Unhighlight();
+            // Hide all buttons
         }
     }
 }
