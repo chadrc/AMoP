@@ -14,6 +14,7 @@ public class EnergyFactory : ScriptableObject
         var energyObj = GameObject.Instantiate(GetPrefabByAffiliation(affiliation));
         var behavior = energyObj.GetComponent<EnergyBehavior>();
         var energy = new Energy(behavior);
+        behavior.Init(energy);
         
         return energy;
     }
@@ -33,12 +34,3 @@ public class EnergyFactory : ScriptableObject
     }
 }
 
-public class Energy
-{
-    public EnergyBehavior Behavior;
-
-    public Energy(EnergyBehavior behavior)
-    {
-        Behavior = behavior;
-    }
-}

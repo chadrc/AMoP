@@ -3,9 +3,6 @@ using System.Collections;
 
 public class BoardNode
 {
-    // Params: to, amount
-    public event System.Action<BoardNode, int> EnergyTransfered;
-
     private Coroutine updateRoutine;
     
     public BoardNodeBehavior Behavior { get; private set; }
@@ -66,29 +63,39 @@ public class BoardNode
         }
     }
 
-    private void OnEnergyEnter(int amount)
+    private void OnEnergyEnter(EnergyBehavior energyBehavior)
     {
-
-    }
-
-    #region Static
-
-    public static void TransferEnergy(BoardNode from, BoardNode to)
-    {
-        int energy = (int)from.Energy.Value;
-        from.Energy.Value -= energy;
-        float willBe = to.Energy.Value + energy;
-        if (willBe > 20.0f)
+        if (energyBehavior.EnergyObj.Affiliation == Affiliation)
         {
-            willBe = 20.0f;
+            float newValue = Energy + 1;
+            if (newValue <= 20f)
+            {
+                Energy.Value = newValue;
+            }
         }
-        to.Energy.Value = willBe;
-
-        if (from.EnergyTransfered != null)
+        else
         {
-           from.EnergyTransfered(to, energy);
+            float newValue = Energy - 1;
+            if (newValue >= 0)
+            {
+                Energy.Value = newValue;
+            }
         }
     }
 
-    #endregion
+    public void SendEnergy(BoardNode to)
+    {
+        Behavior.StartCoroutine(DoSendEnergy(to));
+    }
+
+    IEnumerator DoSendEnergy(BoardNode to)
+    {
+        while (Energy > 0)
+        {
+            var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(BoardNodeAffiliation.Player);
+            energy.Travel(this, to);
+            Energy.Value--;
+            yield return new WaitForSeconds(.1f);
+        }
+    }
 }

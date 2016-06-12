@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class BoardNodeBehavior : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class BoardNodeBehavior : MonoBehaviour
 
     public BoardNode Node { get; private set; }
     
-    public event System.Action<int> EnergyEnter;
+    public event System.Action<EnergyBehavior> EnergyEnter;
 
     public void Select()
     {
@@ -45,7 +46,6 @@ public class BoardNodeBehavior : MonoBehaviour
         node.Affiliation.Changed += OnNodeAffiliationChanged;
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
-        node.EnergyTransfered += OnEnergyTransfered;
         Resize();
     }
 
@@ -76,11 +76,6 @@ public class BoardNodeBehavior : MonoBehaviour
         Resize();
     }
 
-    private void OnEnergyTransfered(BoardNode to, int amount)
-    {
-
-    }
-
     private void Resize()
     {
         graphicObject.transform.localScale = Vector3.Lerp(minScale, maxScale, Node.Energy / 20f);
@@ -103,6 +98,10 @@ public class BoardNodeBehavior : MonoBehaviour
 
     void OnTriggerEnter(Collider collider)
     {
-
+        var energy = collider.gameObject.GetComponent<EnergyBehavior>();
+        if (energy != null && energy.EnergyObj.Origin != Node && EnergyEnter != null)
+        {
+            EnergyEnter(energy);
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections;
 
 public class LevelBehavior : MonoBehaviour
 {
-    public static LevelBehavior current;
+    public static LevelBehavior Current { get; private set; }
 
     [SerializeField]
     private BoardBehavior boardBehavior;
@@ -22,20 +22,28 @@ public class LevelBehavior : MonoBehaviour
     private NodeButtonPanelViewController buttonController;
 
     private Board board;
-    private bool canSwipe = true;
     private BoardNode selectedNode;
-    private EnergyPoolManager energyPoolManager;
+    public EnergyPoolManager EnergyPoolManager { get; private set; }
 
     private NodeButtonBehavior downButton;
+
+    void Awake()
+    {
+        if (Current == null)
+        {
+            Current = this;
+        }
+        else
+        {
+            throw new System.Exception("Duplicate Singleton Creation.");
+        }
+    }
 
 	// Use this for initialization
 	void Start ()
     {
-        energyPoolManager = new EnergyPoolManager(energyFactory);
+        EnergyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
-
-
-
         board.Behavior.SpinEnd += OnSpinEnd;
         buttonController.NodeButtonPointerDown += OnNodeButtonDown;
         buttonController.NodeButtonPointerUp += OnNodeButtonUp;
@@ -91,7 +99,7 @@ public class LevelBehavior : MonoBehaviour
                 if (adjacentNode != null)
                 {
                     // Perform energy transfer
-                    BoardNode.TransferEnergy(selectedNode, adjacentNode);
+                    selectedNode.SendEnergy(adjacentNode);
                 }
             }
             selectedNode = null;

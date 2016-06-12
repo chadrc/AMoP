@@ -15,38 +15,63 @@ public class EnergyPoolManager
         enemyEnergies = InitPoolForAffiliation(BoardNodeAffiliation.Enemy, "Enemy Energy Pool", "Enemy Energy");
     }
 
-    public Energy GetEnergy(BoardNodeAffiliation affiliation)
+    public List<Energy> GetEnergy(BoardNodeAffiliation affiliation, int amount)
     {
-        Energy energy = null;
+        if (amount == 0)
+        {
+            return new List<Energy>();
+        }
+
+        List<Energy> energies = null;
         switch (affiliation)
         {
             case BoardNodeAffiliation.Player:
-                energy = GetInactive(playerEnergies);
+                energies = GetInactive(playerEnergies, amount);
                 break;
             case BoardNodeAffiliation.Enemy:
-                energy = GetInactive(enemyEnergies);
+                energies = GetInactive(enemyEnergies, amount);
                 break;
             case BoardNodeAffiliation.Neutral:
                 Debug.LogWarning("Attempting to get neutral energy.");
                 return null;
         }
-        if (energy == null)
+        if (energies.Count == 0)
         {
             Debug.LogError("All energy in pool for affiliation " + affiliation + " are active. Pool size increase needed.");
         }
-        return null;
+        return energies;
     }
 
-    private Energy GetInactive(List<Energy> energies)
+    public Energy GetOneEnergy(BoardNodeAffiliation affiliation)
     {
+        var list = GetEnergy(affiliation, 1);
+        return list.Count == 0 ? null : list[0];
+    }
+
+    private List<Energy> GetInactive(List<Energy> energies, int amount)
+    {
+        List<Energy> inactiveEnergies = new List<Energy>();
         foreach(var energy in energies)
         {
             if (!energy.Behavior.gameObject.activeSelf)
             {
-                return energy;
+                if (inactiveEnergies.Count < amount)
+                {
+                    inactiveEnergies.Add(energy);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
-        return null;
+        return inactiveEnergies;
+    }
+
+    private Energy GetFirstInactive(List<Energy> energies)
+    {
+        var list = GetInactive(energies, 1);
+        return list.Count == 0 ? null : list[0];
     }
 
     private List<Energy> InitPoolForAffiliation(BoardNodeAffiliation affiliation, string parentName, string energyNameBase)
