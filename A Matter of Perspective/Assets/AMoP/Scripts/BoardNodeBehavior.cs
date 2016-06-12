@@ -6,31 +6,32 @@ public class BoardNodeBehavior : MonoBehaviour
     [SerializeField]
     private GameObject graphicObject;
 
+    public BoardNode Node { get; private set; }
+
+    public event System.Action<EnergyBehavior> EnergyEnter;
+
+    new private MeshRenderer renderer;
     private Vector3 minScale = new Vector3(.25f, .25f, .25f);
     private Vector3 maxScale = new Vector3(.75f, .75f, .75f);
 
-    public BoardNode Node { get; private set; }
-    
-    public event System.Action<EnergyBehavior> EnergyEnter;
-
     public void Select()
     {
-        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.red;
+        //renderer.material.color = Color.red;
     }
 
     public void Deselect()
     {
-        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
+        //renderer.material.color = Color.white;
     }
 
     public void Highlight()
     {
-        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.green;
+        //renderer.material.color = Color.green;
     }
 
     public void Unhighlight()
     {
-        transform.GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
+        //renderer.material.color = Color.white;
     }
 
     public void AttachToNode(BoardNode node)
@@ -47,6 +48,7 @@ public class BoardNodeBehavior : MonoBehaviour
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
         Resize();
+        ChangeColor();
     }
 
     public void DetachFromNode()
@@ -63,7 +65,7 @@ public class BoardNodeBehavior : MonoBehaviour
 
     private void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
     {
-
+        ChangeColor();
     }
 
     private void OnNodeTypeChanged(BoardNodeType type)
@@ -81,11 +83,30 @@ public class BoardNodeBehavior : MonoBehaviour
         graphicObject.transform.localScale = Vector3.Lerp(minScale, maxScale, Node.Energy / 20f);
     }
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+    private void ChangeColor()
+    {
+        switch (Node.Affiliation.Value)
+        {
+            case BoardNodeAffiliation.Player:
+                renderer.material.color = Color.cyan;
+                break;
 
+            case BoardNodeAffiliation.Enemy:
+                renderer.material.color = new Color(1.0f, 1.0f, 0);
+                break;
+
+            case BoardNodeAffiliation.Neutral:
+                renderer.material.color = Color.white;
+                break;
+        }
+    }
+
+	// Use this for initialization
+	void Awake ()
+    {
+        renderer = transform.GetChild(0).GetComponent<MeshRenderer>();
+    }
+    
     void OnDestroy()
     {
         DetachFromNode();

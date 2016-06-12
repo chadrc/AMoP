@@ -65,8 +65,9 @@ public class BoardNode
 
     private void OnEnergyEnter(EnergyBehavior energyBehavior)
     {
-        if (energyBehavior.EnergyObj.Affiliation == Affiliation)
+        if (energyBehavior.EnergyObj.Affiliation == Affiliation.Value || Affiliation.Value == BoardNodeAffiliation.Neutral)
         {
+            Affiliation.Value = energyBehavior.EnergyObj.Affiliation;
             float newValue = Energy + 1;
             if (newValue <= 20f)
             {
@@ -79,6 +80,10 @@ public class BoardNode
             if (newValue >= 0)
             {
                 Energy.Value = newValue;
+                if (newValue == 0)
+                {
+                    Affiliation.Value = BoardNodeAffiliation.Neutral;
+                }
             }
         }
     }
@@ -92,7 +97,7 @@ public class BoardNode
     {
         while (Energy > 0)
         {
-            var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(BoardNodeAffiliation.Player);
+            var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(Affiliation);
             energy.Travel(this, to);
             Energy.Value--;
             yield return new WaitForSeconds(.1f);
