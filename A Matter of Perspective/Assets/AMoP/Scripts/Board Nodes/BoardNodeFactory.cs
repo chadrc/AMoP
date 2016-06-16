@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class BoardNodeFactory : ScriptableObject
 {
@@ -23,31 +23,20 @@ public class BoardNodeFactory : ScriptableObject
 
     public BoardNode CreateNode(BoardNodeData data)
     {
-        var node = new BoardNode(data);
-
-        var nodeObj = GameObject.Instantiate(getPrefabForType(data.Type)) as GameObject;
-        var behavior = nodeObj.GetComponent<BoardNodeBehavior>();
-
-        node.AttachedToBehavior(behavior);
-        behavior.AttachToNode(node);
-
-        return node;
-    }
-
-    private GameObject getPrefabForType(BoardNodeType type)
-    {
         GameObject prefab = null;
+        BoardNode node = null;
 
-        switch(type)
+        switch (data.Type)
         {
             case BoardNodeType.Basic:
                 prefab = BasicBoardNodePrefab;
+                node = new BasicBoardNode(data);
                 break;
 
             case BoardNodeType.Block:
                 prefab = BlockBoardNodePrefab;
                 break;
-                
+
             case BoardNodeType.Moving:
                 prefab = MovingBoardNodePrefab;
                 break;
@@ -58,6 +47,7 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Pool:
                 prefab = PoolBoardNodePrefab;
+                node = new PoolBoardNode(data);
                 break;
 
             case BoardNodeType.Vortex:
@@ -65,6 +55,12 @@ public class BoardNodeFactory : ScriptableObject
                 break;
         }
 
-        return prefab;
+        var nodeObj = GameObject.Instantiate(prefab) as GameObject;
+        var behavior = nodeObj.GetComponent<BoardNodeBehavior>();
+
+        node.AttachedToBehavior(behavior);
+        behavior.AttachToNode(node);
+
+        return node;
     }
 }

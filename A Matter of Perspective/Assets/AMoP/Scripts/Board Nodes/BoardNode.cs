@@ -1,17 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BoardNode
+public abstract class BoardNode
 {
     private Coroutine updateRoutine;
     
     public BoardNodeBehavior Behavior { get; private set; }
     public Board ParentBoard { get; private set; }
 
-    public Property<Vector3> Position { get; private set; }
-    public Property<BoardNodeType> Type { get; private set; }
-    public Property<BoardNodeAffiliation> Affiliation { get; private set; }
-    public Property<float> Energy { get; private set; }
+    public Property<Vector3> Position { get; protected set; }
+    public Property<BoardNodeType> Type { get; protected set; }
+    public Property<BoardNodeAffiliation> Affiliation { get; protected set; }
+    public Property<float> Energy { get; protected set; }
+
+    public abstract bool CanSend { get; }
+    public abstract bool CanReceive { get; }
+
+    protected float MaxEnergy = 20.0f;
 
     public BoardNode(BoardNodeData data)
     {
@@ -53,13 +58,11 @@ public class BoardNode
         Behavior = null;
     }
 
-    private IEnumerator UpdateRoutine()
+    public void SendEnergy(BoardNode to)
     {
-        while(true)
+        if (CanSend && to.CanReceive)
         {
-            // Update Node
-
-            yield return new WaitForEndOfFrame();
+            Behavior.StartCoroutine(DoSendEnergy(to));
         }
     }
 
@@ -88,19 +91,26 @@ public class BoardNode
         }
     }
 
-    public void SendEnergy(BoardNode to)
+    private IEnumerator DoSendEnergy(BoardNode to)
     {
-        Behavior.StartCoroutine(DoSendEnergy(to));
-    }
-
-    IEnumerator DoSendEnergy(BoardNode to)
-    {
-        while (Energy > 0)
+        int toSend = (int)Energy.Value;
+        var range = new Range(toSend);
+        foreach(var i in range)
         {
-            var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(Affiliation);
-            energy.Travel(this, to);
+            Behavior.SendEnergy(to);
             Energy.Value--;
             yield return new WaitForSeconds(.1f);
         }
     }
+
+    private IEnumerator UpdateRoutine()
+    {
+        while (true)
+        {
+            Update();
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    protected abstract void Update();
 }

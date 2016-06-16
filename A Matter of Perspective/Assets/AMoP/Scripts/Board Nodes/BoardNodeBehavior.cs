@@ -58,6 +58,12 @@ public class BoardNodeBehavior : MonoBehaviour
         Node.Energy.Changed -= OnNodeEnergyChanged;
     }
 
+    public void SendEnergy(BoardNode to)
+    {
+        var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(Node.Affiliation);
+        energy.Travel(Node, to);
+    }
+
     private void setRendererAlpha(float a)
     {
         var clr = renderer.material.color;
