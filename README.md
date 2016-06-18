@@ -1,2 +1,2 @@
 # AMoP
-Perspective puzzle game made in Unity
+Perspective puzzle game made in Unity.
