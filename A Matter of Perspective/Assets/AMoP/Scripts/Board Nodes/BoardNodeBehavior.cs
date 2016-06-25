@@ -10,7 +10,7 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     {
         DetachFromNode();
 
-        // 2.5 is the center of 6 unit spheres
+        // 2.5 is 3 (half of board size 6) minus .5 (offset to nodes default position at the origin)
         // subtract it from all nodes to center board on screen
         Vector3 pos = node.Position - new Vector3(2.5f, 2.5f, 2.5f);
         transform.position = pos;
@@ -19,6 +19,8 @@ public abstract class BoardNodeBehavior : MonoBehaviour
         node.Affiliation.Changed += OnNodeAffiliationChanged;
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
+        OnNodeEnergyChanged(node.Energy);
+        OnNodeAffiliationChanged(node.Affiliation);
     }
 
     public void DetachFromNode()
@@ -53,7 +55,6 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     protected abstract void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation);
     protected abstract void OnNodeTypeChanged(BoardNodeType type);
     protected abstract void OnNodeEnergyChanged(float energy);
-    protected abstract void ChangeColor();
 
     // Use this for initialization
     protected abstract void Awake();
