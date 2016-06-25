@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[RequireComponent (typeof(SphereCollider))]
 public abstract class BoardNodeBehavior : MonoBehaviour
 {
     public BoardNode Node { get; private set; }
