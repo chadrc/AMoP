@@ -45,6 +45,12 @@ public class LevelBehavior : MonoBehaviour
         EnergyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
         board.Behavior.SpinEnd += OnSpinEnd;
+        foreach (var node in board)
+        {
+            node.Affiliation.Changed += OnNodeAffiliationChanged;
+        }
+
+        // UI Events
         buttonController.NodeButtonPointerDown += OnNodeButtonDown;
         buttonController.NodeButtonPointerUp += OnNodeButtonUp;
         buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
@@ -60,6 +66,25 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
         buttonController.SwipeOccurred -= OnSwipeOccurred;
         board.Behavior.SpinEnd -= OnSpinEnd;
+        foreach (var node in board)
+        {
+            node.Affiliation.Changed -= OnNodeAffiliationChanged;
+        }
+    }
+
+    void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
+    {
+        foreach (var node in board)
+        {
+            // If any node doesn't equal new affiliation, board still needs to be filled
+            if (node.CanReceive && node.Affiliation != affiliation)
+            {
+                return;
+            }
+        }
+
+        // Win
+        Debug.Log("Win");
     }
 
     void OnNodeButtonDown(NodeButtonBehavior button)
@@ -92,15 +117,17 @@ public class LevelBehavior : MonoBehaviour
                 var nodePos = node.Behavior.transform.position;
                 Vector2 dir = MathUtils.ClosestCardinal(nodePos - sNodePos);
                 // Find node in that direction of selectedNode
-                BoardNode adjacentNode = board.GetNode(
-                    (int)(selectedNode.Behavior.transform.position.x + 2.5f + dir.x), 
-                    (int)(selectedNode.Behavior.transform.position.y + 2.5f + dir.y));
-                if (adjacentNode != null)
+                float nodeX = selectedNode.Behavior.transform.position.x + 2.5f + dir.x;
+                float nodeY = selectedNode.Behavior.transform.position.y + 2.5f + dir.y;
+
+                BoardNode adjacentNode = board.GetNode(Mathf.RoundToInt(nodeX), Mathf.RoundToInt(nodeY));
+                if (adjacentNode != null && adjacentNode != selectedNode)
                 {
                     // Perform energy transfer
                     selectedNode.SendEnergy(adjacentNode);
                 }
             }
+            downButton = null;
             selectedNode = null;
         }
         else if (downButton != null)
@@ -109,6 +136,7 @@ public class LevelBehavior : MonoBehaviour
             board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
             downButton.Deselect();
             downButton = null;
+            selectedNode = null;
         }
     }
 
@@ -134,7 +162,7 @@ public class LevelBehavior : MonoBehaviour
         else // Node previously selected
         { 
             // adjacent node
-            if ( Vector3.Distance(selectedNode.Behavior.transform.position, node.Behavior.transform.position) <= 1.25f && node.CanReceive)
+            if (Vector2.Distance(selectedNode.PerspectivePos, node.PerspectivePos) <= 1.25f && node.CanReceive)
             {
                 button.Hover();
             }
@@ -153,6 +181,12 @@ public class LevelBehavior : MonoBehaviour
     void OnSwipeOccurred(Vector2 dir)
     {
         board.Behavior.Spin(dir);
+        if (downButton != null)
+        {
+            downButton.Deselect();
+            downButton = null;
+        }
+        selectedNode = null;
     }
 
     void OnSpinEnd()

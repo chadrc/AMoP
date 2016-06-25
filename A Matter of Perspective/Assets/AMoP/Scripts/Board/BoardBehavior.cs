@@ -36,11 +36,13 @@ public class BoardBehavior : MonoBehaviour {
                 if (boardRow.Closest != null)
                 {
                     boardRow.Closest.Behavior.NoFade();
+                    boardRow.Closest.Enable();
                 }
 
                 foreach (var node in boardRow.Hidden)
                 {
                     node.Behavior.FullFade();
+                    node.Disable();
                 }
             }
         }

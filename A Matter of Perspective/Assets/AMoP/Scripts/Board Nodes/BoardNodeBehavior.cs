@@ -4,6 +4,7 @@
 public abstract class BoardNodeBehavior : MonoBehaviour
 {
     public BoardNode Node { get; private set; }
+    public SphereCollider EnergyCollider { get; private set; }
     public event System.Action<EnergyBehavior> EnergyEnter;
 
     public virtual void AttachToNode(BoardNode node)
@@ -12,6 +13,7 @@ public abstract class BoardNodeBehavior : MonoBehaviour
 
         // 2.5 is 3 (half of board size 6) minus .5 (offset to nodes default position at the origin)
         // subtract it from all nodes to center board on screen
+        EnergyCollider = GetComponent<SphereCollider>();
         Vector3 pos = node.Position - new Vector3(2.5f, 2.5f, 2.5f);
         transform.position = pos;
 

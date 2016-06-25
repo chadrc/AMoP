@@ -7,6 +7,13 @@ public abstract class BoardNode
     
     public BoardNodeBehavior Behavior { get; private set; }
     public Board ParentBoard { get; private set; }
+    public Vector2 PerspectivePos
+    {
+        get
+        {
+            return new Vector2(Behavior.transform.position.x, Behavior.transform.position.y);
+        }
+    }
 
     public Property<Vector3> Position { get; protected set; }
     public Property<BoardNodeType> Type { get; protected set; }
@@ -29,6 +36,16 @@ public abstract class BoardNode
     ~BoardNode()
     {
         DetachFromBehavior();
+    }
+
+    public void Enable()
+    {
+        Behavior.EnergyCollider.enabled = true;
+    }
+
+    public void Disable()
+    {
+        Behavior.EnergyCollider.enabled = false;
     }
 
     public void SetBoard(Board board)
