@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -42,7 +43,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
                 GameObject.Destroy(button.gameObject);
             }
             nodeButtons.Clear();
-            initialize();
+            StartCoroutine(initialize());
         }
     }
 
@@ -91,7 +92,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
-    private void initialize()
+    private IEnumerator initialize()
     {
         InitialScreenHeight = Screen.height;
         InitialScreenWidth = Screen.width;
@@ -107,6 +108,9 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             // Portrait
             Camera.main.orthographicSize = 4.0f / ratio;
         }
+
+        // Need to wait for camera to update fully before recreating buttons
+        yield return new WaitForEndOfFrame();
 
         for (int i = 0; i < 6; i++)
         {
