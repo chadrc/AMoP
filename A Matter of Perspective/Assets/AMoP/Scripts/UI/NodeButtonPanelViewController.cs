@@ -95,6 +95,19 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     {
         InitialScreenHeight = Screen.height;
         InitialScreenWidth = Screen.width;
+        float ratio = InitialScreenWidth / (float)InitialScreenHeight;
+
+        if (ratio >= 1.0f)
+        {
+            // Landscape
+            Camera.main.orthographicSize = 4.0f;
+        }
+        else
+        {
+            // Portrait
+            Camera.main.orthographicSize = 4.0f / ratio;
+        }
+
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 6; j++)
