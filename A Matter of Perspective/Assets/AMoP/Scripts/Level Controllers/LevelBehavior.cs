@@ -65,7 +65,7 @@ public class LevelBehavior : MonoBehaviour
     void OnNodeButtonDown(NodeButtonBehavior button)
     {
         BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player)
+        if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player && node.CanSend)
         {
             button.Select();
             selectedNode = node;
@@ -115,9 +115,29 @@ public class LevelBehavior : MonoBehaviour
     void OnNodeButtonEnter(NodeButtonBehavior button)
     {
         BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && (selectedNode != null || node.Affiliation.Value == BoardNodeAffiliation.Player) && node != selectedNode)
+
+        // Nothing selected or is the same as previously selected
+        if (node == null || node == selectedNode)
         {
-            button.Hover();
+            return;
+        }
+
+        // If nothing previously selected 
+        if (selectedNode == null)
+        {
+            // Player owned node and is player node and node is flagged to send
+            if (node.Affiliation.Value == BoardNodeAffiliation.Player && node.CanSend)
+            {
+                button.Hover();
+            }
+        }
+        else // Node previously selected
+        { 
+            // adjacent node
+            if ( Vector3.Distance(selectedNode.Behavior.transform.position, node.Behavior.transform.position) <= 1.25f && node.CanReceive)
+            {
+                button.Hover();
+            }
         }
     }
 
