@@ -95,7 +95,7 @@ public abstract class BoardNode
     {
         int toSend = (int)Energy.Value;
         var range = new Range(toSend);
-        foreach(var i in range)
+        foreach(var _ in range)
         {
             Behavior.SendEnergy(to);
             Energy.Value--;
