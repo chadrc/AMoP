@@ -39,6 +39,9 @@ public class EndGamePanelViewController : MonoBehaviour
     public void MenuButtonPress()
     {
         menu.Show();
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     public void ReplayButtonPress()
@@ -46,7 +49,7 @@ public class EndGamePanelViewController : MonoBehaviour
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
-        LevelBehavior.Current.InitBoard();
+        LevelBehavior.Current.StartGame();
     }
 
     public void NextButtonPress()

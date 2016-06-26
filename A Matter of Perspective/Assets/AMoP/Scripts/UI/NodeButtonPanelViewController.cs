@@ -27,14 +27,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     void Awake ()
     {
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
-        LevelBehavior.GameStart += onGameStart;
-        LevelBehavior.GameEnd += onGameEnd;
-    }
-    
-    void OnDestory()
-    {
-        LevelBehavior.GameStart -= onGameStart;
-        LevelBehavior.GameEnd -= onGameEnd;
+        StartCoroutine(initialize());
     }
 
     public void ButtonDown(NodeButtonBehavior button, PointerEventData eventData)
@@ -90,20 +83,6 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
         nodeButtons.Clear();
         StartCoroutine(initialize());
-    }
-
-    private void onGameStart()
-    {
-        StartCoroutine(initialize());
-    }
-
-    private void onGameEnd()
-    {
-        foreach (var button in nodeButtons)
-        {
-            GameObject.Destroy(button.gameObject);
-        }
-        nodeButtons.Clear();
     }
 
     private IEnumerator initialize()

@@ -25,7 +25,7 @@ public class MenuViewController : MonoBehaviour
 
     public void StartButtonPressed()
     {
-        LevelBehavior.Current.InitBoard();
+        LevelBehavior.Current.StartGame();
         canvasGroup.gameObject.SetActive(false);
     }
 

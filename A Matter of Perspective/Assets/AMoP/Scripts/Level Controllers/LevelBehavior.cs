@@ -31,11 +31,13 @@ public class LevelBehavior : MonoBehaviour
     public EnergyPoolManager EnergyPoolManager { get; private set; }
     public float GameTime { get; private set; }
 
-    public void InitBoard()
+    public void StartGame()
     {
-        destroyBoard();
+        Time.timeScale = 1.0f;
+        EnergyPoolManager.HideAllEnergy();
+        DestroyBoard();
+
         GameTime = 0;
-        EnergyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
         board.Behavior.SpinEnd += OnSpinEnd;
         foreach (var node in board)
@@ -43,18 +45,28 @@ public class LevelBehavior : MonoBehaviour
             node.Affiliation.Changed += OnNodeAffiliationChanged;
         }
 
-        // UI Events
-        buttonController.NodeButtonPointerDown += OnNodeButtonDown;
-        buttonController.NodeButtonPointerUp += OnNodeButtonUp;
-        buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
-        buttonController.NodeButtonPointerExit += OnNodeButtonExit;
-        buttonController.SwipeOccurred += OnSwipeOccurred;
-
         playing = true;
         if (GameStart != null)
         {
             GameStart();
         }
+    }
+
+    public void DestroyBoard()
+    {
+        if (board == null)
+        {
+            return;
+        }
+
+        foreach (var node in board)
+        {
+            node.Affiliation.Changed -= OnNodeAffiliationChanged;
+            GameObject.Destroy(node.Behavior.gameObject);
+        }
+        board.Behavior.SpinEnd -= OnSpinEnd;
+        board.Behavior.Uninit();
+        board = null;
     }
 
     void Awake()
@@ -69,6 +81,17 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // UI Events
+        EnergyPoolManager = new EnergyPoolManager(energyFactory);
+        buttonController.NodeButtonPointerDown += OnNodeButtonDown;
+        buttonController.NodeButtonPointerUp += OnNodeButtonUp;
+        buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
+        buttonController.NodeButtonPointerExit += OnNodeButtonExit;
+        buttonController.SwipeOccurred += OnSwipeOccurred;
+    }
+
     void Update()
     {
         if (playing)
@@ -79,38 +102,12 @@ public class LevelBehavior : MonoBehaviour
 
     void OnDestory()
     {
-        breakDownGame();
-    }
-
-    void breakDownGame()
-    {
         buttonController.NodeButtonPointerDown -= OnNodeButtonDown;
         buttonController.NodeButtonPointerUp -= OnNodeButtonUp;
         buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
         buttonController.SwipeOccurred -= OnSwipeOccurred;
         board.Behavior.SpinEnd -= OnSpinEnd;
-        foreach (var node in board)
-        {
-            node.Affiliation.Changed -= OnNodeAffiliationChanged;
-        }
-    }
-
-    void destroyBoard()
-    {
-        if (board == null)
-        {
-            return;
-        }
-
-        foreach (var node in board)
-        {
-            GameObject.Destroy(node.Behavior.gameObject);
-        }
-        board.Behavior.Uninit();
-        board = null;
-
-        EnergyPoolManager.HideAllEnergy();
     }
 
     void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
