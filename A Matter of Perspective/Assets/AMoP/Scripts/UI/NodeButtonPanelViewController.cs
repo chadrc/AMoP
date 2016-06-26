@@ -31,6 +31,12 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     void Start ()
     {
         initialize();
+        LevelBehavior.GameEnd += onGameEnd;
+    }
+
+    void OnDestory()
+    {
+        LevelBehavior.GameEnd -= onGameEnd;
     }
 
     void Update()
@@ -89,6 +95,14 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         if (NodeButtonPointerExit != null)
         {
             NodeButtonPointerExit(button);
+        }
+    }
+
+    private void onGameEnd()
+    {
+        foreach (var button in nodeButtons)
+        {
+            GameObject.Destroy(button.gameObject);
         }
     }
 

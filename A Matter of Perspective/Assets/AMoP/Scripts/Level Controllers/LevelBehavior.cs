@@ -5,6 +5,7 @@ using System.Collections;
 public class LevelBehavior : MonoBehaviour
 {
     public static LevelBehavior Current { get; private set; }
+    public static event System.Action GameEnd;
 
     [SerializeField]
     private BoardBehavior boardBehavior;
@@ -27,20 +28,7 @@ public class LevelBehavior : MonoBehaviour
 
     private NodeButtonBehavior downButton;
 
-    void Awake()
-    {
-        if (Current == null)
-        {
-            Current = this;
-        }
-        else
-        {
-            throw new System.Exception("Duplicate Singleton Creation.");
-        }
-    }
-
-	// Use this for initialization
-	void Start ()
+    public void InitBoard()
     {
         EnergyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
@@ -56,9 +44,26 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
-	}
+    }
 
-    void OnDestroy()
+    void Awake()
+    {
+        if (Current == null)
+        {
+            Current = this;
+        }
+        else
+        {
+            throw new System.Exception("Duplicate Singleton Creation.");
+        }
+    }
+
+    void OnDestory()
+    {
+        breakDownGame();
+    }
+
+    void breakDownGame()
     {
         buttonController.NodeButtonPointerDown -= OnNodeButtonDown;
         buttonController.NodeButtonPointerUp -= OnNodeButtonUp;
@@ -83,8 +88,21 @@ public class LevelBehavior : MonoBehaviour
             }
         }
 
-        // Win
-        Debug.Log("Win");
+        // Clean up resources
+        breakDownGame();
+        foreach(var node in board)
+        {
+            GameObject.Destroy(node.Behavior.gameObject);
+        }
+        GameObject.Destroy(board.Behavior.gameObject);
+        board = null;
+
+        EnergyPoolManager.HideAllEnergy();
+
+        if (GameEnd != null)
+        {
+            GameEnd();
+        }
     }
 
     void OnNodeButtonDown(NodeButtonBehavior button)
@@ -117,7 +135,7 @@ public class LevelBehavior : MonoBehaviour
                 var nodePos = node.Behavior.transform.position;
                 Vector2 dir = MathUtils.ClosestCardinal(nodePos - sNodePos);
                 // Find node in that direction of selectedNode
-                float nodeX = selectedNode.Behavior.transform.position.x + 2.5f + dir.x;
+                float nodeX = selectedNode.Behavior.transform.position.x + 2.5f + dir.x; 
                 float nodeY = selectedNode.Behavior.transform.position.y + 2.5f + dir.y;
 
                 BoardNode adjacentNode = board.GetNode(Mathf.RoundToInt(nodeX), Mathf.RoundToInt(nodeY));

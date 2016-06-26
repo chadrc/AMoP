@@ -15,6 +15,19 @@ public class EnergyPoolManager
         enemyEnergies = InitPoolForAffiliation(BoardNodeAffiliation.Enemy, "Enemy Energy Pool", "Enemy Energy");
     }
 
+    public void HideAllEnergy()
+    {
+        foreach(var e in playerEnergies)
+        {
+            e.Behavior.gameObject.SetActive(false);
+        }
+
+        foreach (var e in enemyEnergies)
+        {
+            e.Behavior.gameObject.SetActive(false);
+        }
+    }
+
     public List<Energy> GetEnergy(BoardNodeAffiliation affiliation, int amount)
     {
         if (amount == 0)
