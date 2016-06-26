@@ -45,7 +45,7 @@ public class Range : IEnumerable
 
         public bool MoveNext()
         {
-            return ++current < range.max;
+            return current++ < range.max;
         }
 
         public void Reset()

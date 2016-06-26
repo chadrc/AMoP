@@ -110,7 +110,7 @@ public abstract class BoardNode
 
     private IEnumerator DoSendEnergy(BoardNode to)
     {
-        int toSend = (int)Energy.Value;
+        int toSend = Mathf.RoundToInt(Energy.Value);
         var range = new Range(toSend);
         #pragma warning disable 0168
         foreach (var i in range)
