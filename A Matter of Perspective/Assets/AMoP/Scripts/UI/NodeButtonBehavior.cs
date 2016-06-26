@@ -7,6 +7,9 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
     [SerializeField]
     private Image graphic;
 
+    [SerializeField]
+    private Text energyText;
+
     public NodeButtonPanelViewController Controller { get; private set; }
     public int XIndex { get; private set; }
     public int YIndex { get; private set; }
@@ -16,6 +19,7 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        LevelBehavior.GameStart += onGameStart;
     }
 
     public void Init(NodeButtonPanelViewController controller, int xIndex, int yIndex)
@@ -29,6 +33,21 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
         float pixelHeight = Screen.height * heightRatio;
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
+    }
+
+    private void onGameStart()
+    {
+        var node = LevelBehavior.Current.CurrentBoard.GetNode(XIndex, YIndex);
+        if (node != null)
+        {
+            node.Energy.Changed += onNodeEnergyChanged;
+            energyText.text = ((int)node.Energy.Value).ToString();
+        }
+    }
+
+    private void onNodeEnergyChanged(float value)
+    {
+        energyText.text = ((int)value).ToString();
     }
 
     private void Show()

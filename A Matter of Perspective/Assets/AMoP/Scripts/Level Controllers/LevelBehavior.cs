@@ -25,12 +25,12 @@ public class LevelBehavior : MonoBehaviour
 
     [SerializeField]
     private NodeButtonPanelViewController buttonController;
-
-    private Board board;
+    
     private BoardNode selectedNode;
     private NodeButtonBehavior downButton;
     private bool playing = false;
 
+    public Board CurrentBoard { get; private set; }
     public EnergyPoolManager EnergyPoolManager { get; private set; }
     public float GameTime { get; private set; }
     public bool HasNextLevel
@@ -69,9 +69,9 @@ public class LevelBehavior : MonoBehaviour
             Debug.LogError("No board data in series " + boardSeriesIndex + " with index " + startingBoardIndex);
             return;
         }
-        board = new Board(boardData, boardBehavior, boardNodeFactory);
-        board.Behavior.SpinEnd += OnSpinEnd;
-        foreach (var node in board)
+        CurrentBoard = new Board(boardData, boardBehavior, boardNodeFactory);
+        CurrentBoard.Behavior.SpinEnd += OnSpinEnd;
+        foreach (var node in CurrentBoard)
         {
             node.Affiliation.Changed += OnNodeAffiliationChanged;
         }
@@ -104,19 +104,19 @@ public class LevelBehavior : MonoBehaviour
 
     public void DestroyBoard()
     {
-        if (board == null)
+        if (CurrentBoard == null)
         {
             return;
         }
 
-        foreach (var node in board)
+        foreach (var node in CurrentBoard)
         {
             node.Affiliation.Changed -= OnNodeAffiliationChanged;
             GameObject.Destroy(node.Behavior.gameObject);
         }
-        board.Behavior.SpinEnd -= OnSpinEnd;
-        board.Behavior.Uninit();
-        board = null;
+        CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
+        CurrentBoard.Behavior.Uninit();
+        CurrentBoard = null;
     }
 
     void Awake()
@@ -157,12 +157,12 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
         buttonController.SwipeOccurred -= OnSwipeOccurred;
-        board.Behavior.SpinEnd -= OnSpinEnd;
+        CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
     }
 
     void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
     {
-        foreach (var node in board)
+        foreach (var node in CurrentBoard)
         {
             // If any node doesn't equal new affiliation, board still needs to be filled
             if (node.CanReceive && node.Affiliation != affiliation)
@@ -181,7 +181,7 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeButtonDown(NodeButtonBehavior button)
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
         if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player && node.CanSend)
         {
             button.Select();
@@ -194,7 +194,7 @@ public class LevelBehavior : MonoBehaviour
     {
         if (selectedNode != null)
         {
-            BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+            BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
             // Hide selected node
             downButton.Deselect();
             // Keep hovered node highlighted after pointer up
@@ -212,7 +212,7 @@ public class LevelBehavior : MonoBehaviour
                 float nodeX = selectedNode.Behavior.transform.position.x + 2.5f + dir.x; 
                 float nodeY = selectedNode.Behavior.transform.position.y + 2.5f + dir.y;
 
-                BoardNode adjacentNode = board.GetNode(Mathf.RoundToInt(nodeX), Mathf.RoundToInt(nodeY));
+                BoardNode adjacentNode = CurrentBoard.GetNode(Mathf.RoundToInt(nodeX), Mathf.RoundToInt(nodeY));
                 if (adjacentNode != null && adjacentNode != selectedNode)
                 {
                     // Perform energy transfer
@@ -225,7 +225,7 @@ public class LevelBehavior : MonoBehaviour
         else if (downButton != null)
         {
             Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
-            board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
+            CurrentBoard.Behavior.Spin(MathUtils.ClosestCardinal(dir));
             downButton.Deselect();
             downButton = null;
             selectedNode = null;
@@ -234,7 +234,7 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeButtonEnter(NodeButtonBehavior button)
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
 
         // Nothing selected or is the same as previously selected
         if (node == null || node == selectedNode)
@@ -263,7 +263,7 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeButtonExit(NodeButtonBehavior button)
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
+        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
         if (node != null && node != selectedNode)
         {
             button.Unhover();
@@ -272,7 +272,7 @@ public class LevelBehavior : MonoBehaviour
 
     void OnSwipeOccurred(Vector2 dir)
     {
-        board.Behavior.Spin(dir);
+        CurrentBoard.Behavior.Spin(dir);
         if (downButton != null)
         {
             downButton.Deselect();
