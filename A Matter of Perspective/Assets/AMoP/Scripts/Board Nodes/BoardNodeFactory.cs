@@ -25,7 +25,7 @@ public class BoardNodeFactory : ScriptableObject
     {
         GameObject prefab = null;
         BoardNode node = null;
-
+        #pragma warning disable 0162
         switch (data.Type)
         {
             case BoardNodeType.Basic:
@@ -58,6 +58,7 @@ public class BoardNodeFactory : ScriptableObject
                 throw new System.NotImplementedException("Vortex board node not implemented.");
                 break;
         }
+        #pragma warning restore 0162
 
         var nodeObj = GameObject.Instantiate(prefab) as GameObject;
         var behavior = nodeObj.GetComponent<BoardNodeBehavior>();

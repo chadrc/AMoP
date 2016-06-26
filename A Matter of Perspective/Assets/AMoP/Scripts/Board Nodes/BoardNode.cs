@@ -112,12 +112,14 @@ public abstract class BoardNode
     {
         int toSend = (int)Energy.Value;
         var range = new Range(toSend);
-        foreach(var _ in range)
+        #pragma warning disable 0168
+        foreach (var i in range)
         {
             Behavior.SendEnergy(to);
             Energy.Value--;
             yield return new WaitForSeconds(.1f);
         }
+        #pragma warning restore 0168
     }
 
     private IEnumerator UpdateRoutine()
