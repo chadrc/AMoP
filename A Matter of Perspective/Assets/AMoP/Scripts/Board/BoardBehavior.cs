@@ -13,6 +13,11 @@ public class BoardBehavior : MonoBehaviour {
         HideShowNodes();
     }
 
+    public void Uninit()
+    {
+        BoardObject = null;
+    }
+
     public void Spin(Vector2 dir)
     {
         if (canSpin)

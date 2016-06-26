@@ -28,14 +28,21 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     private Vector2 pointDown;
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
-        initialize();
+        LevelBehavior.GameStart += onGameStart;
         LevelBehavior.GameEnd += onGameEnd;
+    }
+
+    void Start()
+    {
+        InitialScreenHeight = Screen.height;
+        InitialScreenWidth = Screen.width;
     }
 
     void OnDestory()
     {
+        LevelBehavior.GameStart -= onGameStart;
         LevelBehavior.GameEnd -= onGameEnd;
     }
 
@@ -98,12 +105,18 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
+    private void onGameStart()
+    {
+        StartCoroutine(initialize());
+    }
+
     private void onGameEnd()
     {
         foreach (var button in nodeButtons)
         {
             GameObject.Destroy(button.gameObject);
         }
+        nodeButtons.Clear();
     }
 
     private IEnumerator initialize()

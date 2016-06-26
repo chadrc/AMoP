@@ -5,6 +5,7 @@ using System.Collections;
 public class LevelBehavior : MonoBehaviour
 {
     public static LevelBehavior Current { get; private set; }
+    public static event System.Action GameStart;
     public static event System.Action GameEnd;
 
     [SerializeField]
@@ -44,6 +45,11 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
         buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
+
+        if (GameStart != null)
+        {
+            GameStart();
+        }
     }
 
     void Awake()
@@ -94,7 +100,7 @@ public class LevelBehavior : MonoBehaviour
         {
             GameObject.Destroy(node.Behavior.gameObject);
         }
-        GameObject.Destroy(board.Behavior.gameObject);
+        board.Behavior.Uninit();
         board = null;
 
         EnergyPoolManager.HideAllEnergy();
