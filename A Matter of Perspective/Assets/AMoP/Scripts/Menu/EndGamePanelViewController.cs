@@ -6,6 +6,9 @@ using System.Collections;
 public class EndGamePanelViewController : MonoBehaviour
 {
     [SerializeField]
+    private Button nextLevelButton;
+
+    [SerializeField]
     private Text gameTimeText;
 
     [SerializeField]
@@ -39,29 +42,33 @@ public class EndGamePanelViewController : MonoBehaviour
     public void MenuButtonPress()
     {
         menu.Show();
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        Hide();
     }
 
     public void ReplayButtonPress()
     {
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        Hide();
         LevelBehavior.Current.StartGame();
     }
 
     public void NextButtonPress()
     {
-        throw new System.NotImplementedException("Next level feature not implemented.");
+        Hide();
+        if (LevelBehavior.Current.AdvanceToNextLevel())
+        {
+            LevelBehavior.Current.StartGame();
+        }
+        else
+        {
+            Debug.LogError("Cannot advance to next level or series.");
+        }
     }
 
     private void Hide()
     {
-        canvasGroup.alpha = 1;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     private void onScreenChanged(int width, int height)
@@ -74,6 +81,14 @@ public class EndGamePanelViewController : MonoBehaviour
         canvasGroup.alpha = 0;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
+        if (!LevelBehavior.Current.HasNextLevel && !LevelBehavior.Current.HasNextSeries)
+        {
+            nextLevelButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            nextLevelButton.gameObject.SetActive(true);
+        }
         StartCoroutine(showRoutine());
     }
 

@@ -12,7 +12,10 @@ public class LevelBehavior : MonoBehaviour
     private BoardBehavior boardBehavior;
 
     [SerializeField]
-    private BoardData boardData;
+    private int boardSeriesIndex;
+
+    [SerializeField]
+    private int startingBoardIndex;
 
     [SerializeField]
     private BoardNodeFactory boardNodeFactory;
@@ -30,6 +33,22 @@ public class LevelBehavior : MonoBehaviour
 
     public EnergyPoolManager EnergyPoolManager { get; private set; }
     public float GameTime { get; private set; }
+    public bool HasNextLevel
+    {
+        get
+        {
+            var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
+            return startingBoardIndex+1 < boardSeries.Count;
+        }
+    }
+    public bool HasNextSeries { get { return boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
+
+    public void StartGame(int seriesIndex, int boardIndex)
+    {
+        boardSeriesIndex = seriesIndex;
+        startingBoardIndex = boardIndex;
+        StartGame();
+    }
 
     public void StartGame()
     {
@@ -38,6 +57,18 @@ public class LevelBehavior : MonoBehaviour
         DestroyBoard();
 
         GameTime = 0;
+        var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
+        if (boardSeries == null)
+        {
+            Debug.LogError("No series with index " + boardSeriesIndex);
+            return;
+        }
+        var boardData = boardSeries.GetBoard(startingBoardIndex);
+        if (boardData == null)
+        {
+            Debug.LogError("No board data in series " + boardSeriesIndex + " with index " + startingBoardIndex);
+            return;
+        }
         board = new Board(boardData, boardBehavior, boardNodeFactory);
         board.Behavior.SpinEnd += OnSpinEnd;
         foreach (var node in board)
@@ -50,6 +81,25 @@ public class LevelBehavior : MonoBehaviour
         {
             GameStart();
         }
+    }
+
+    public bool AdvanceToNextLevel()
+    {
+        if (HasNextLevel)
+        {
+            startingBoardIndex++;
+        }
+        else if (HasNextSeries)
+        {
+            boardSeriesIndex++;
+            startingBoardIndex = 0;
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public void DestroyBoard()
