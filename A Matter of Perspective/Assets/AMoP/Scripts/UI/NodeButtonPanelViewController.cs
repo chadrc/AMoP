@@ -19,45 +19,22 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private List<NodeButtonBehavior> nodeButtons = new List<NodeButtonBehavior>();
     private NodeButtonBehavior lastEnter;
-
-    // TODO: Refactor out resize checking into separate behavior with event 
-    private int InitialScreenWidth;
-    private int InitialScreenHeight;
-
+    
     // Swipe Calculation Variables
     private Vector2 pointDown;
 
     // Use this for initialization
     void Awake ()
     {
+        ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         LevelBehavior.GameStart += onGameStart;
         LevelBehavior.GameEnd += onGameEnd;
     }
-
-    void Start()
-    {
-        InitialScreenHeight = Screen.height;
-        InitialScreenWidth = Screen.width;
-    }
-
+    
     void OnDestory()
     {
         LevelBehavior.GameStart -= onGameStart;
         LevelBehavior.GameEnd -= onGameEnd;
-    }
-
-    void Update()
-    {
-        if (Screen.width != InitialScreenWidth ||
-            Screen.height != InitialScreenHeight)
-        {
-            foreach(var button in nodeButtons)
-            {
-                GameObject.Destroy(button.gameObject);
-            }
-            nodeButtons.Clear();
-            StartCoroutine(initialize());
-        }
     }
 
     public void ButtonDown(NodeButtonBehavior button, PointerEventData eventData)
@@ -105,6 +82,16 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
+    private void onScreenChanged(int width, int height)
+    {
+        foreach (var button in nodeButtons)
+        {
+            GameObject.Destroy(button.gameObject);
+        }
+        nodeButtons.Clear();
+        StartCoroutine(initialize());
+    }
+
     private void onGameStart()
     {
         StartCoroutine(initialize());
@@ -121,9 +108,10 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private IEnumerator initialize()
     {
-        InitialScreenHeight = Screen.height;
-        InitialScreenWidth = Screen.width;
-        float ratio = InitialScreenWidth / (float)InitialScreenHeight;
+        // Need to wait for camera to update fully before recreating buttons
+        yield return new WaitForEndOfFrame();
+
+        float ratio = Screen.width / (float)Screen.height;
 
         if (ratio >= 1.0f)
         {
@@ -135,9 +123,6 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             // Portrait
             Camera.main.orthographicSize = 4.0f / ratio;
         }
-
-        // Need to wait for camera to update fully before recreating buttons
-        yield return new WaitForEndOfFrame();
 
         for (int i = 0; i < 6; i++)
         {

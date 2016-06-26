@@ -25,12 +25,16 @@ public class LevelBehavior : MonoBehaviour
 
     private Board board;
     private BoardNode selectedNode;
-    public EnergyPoolManager EnergyPoolManager { get; private set; }
-
     private NodeButtonBehavior downButton;
+    private bool playing = false;
+
+    public EnergyPoolManager EnergyPoolManager { get; private set; }
+    public float GameTime { get; private set; }
 
     public void InitBoard()
     {
+        destroyBoard();
+        GameTime = 0;
         EnergyPoolManager = new EnergyPoolManager(energyFactory);
         board = new Board(boardData, boardBehavior, boardNodeFactory);
         board.Behavior.SpinEnd += OnSpinEnd;
@@ -46,6 +50,7 @@ public class LevelBehavior : MonoBehaviour
         buttonController.NodeButtonPointerExit += OnNodeButtonExit;
         buttonController.SwipeOccurred += OnSwipeOccurred;
 
+        playing = true;
         if (GameStart != null)
         {
             GameStart();
@@ -61,6 +66,14 @@ public class LevelBehavior : MonoBehaviour
         else
         {
             throw new System.Exception("Duplicate Singleton Creation.");
+        }
+    }
+
+    void Update()
+    {
+        if (playing)
+        {
+            GameTime += Time.deltaTime;
         }
     }
 
@@ -83,6 +96,23 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
+    void destroyBoard()
+    {
+        if (board == null)
+        {
+            return;
+        }
+
+        foreach (var node in board)
+        {
+            GameObject.Destroy(node.Behavior.gameObject);
+        }
+        board.Behavior.Uninit();
+        board = null;
+
+        EnergyPoolManager.HideAllEnergy();
+    }
+
     void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
     {
         foreach (var node in board)
@@ -95,16 +125,7 @@ public class LevelBehavior : MonoBehaviour
         }
 
         // Clean up resources
-        breakDownGame();
-        foreach(var node in board)
-        {
-            GameObject.Destroy(node.Behavior.gameObject);
-        }
-        board.Behavior.Uninit();
-        board = null;
-
-        EnergyPoolManager.HideAllEnergy();
-
+        playing = false;
         if (GameEnd != null)
         {
             GameEnd();

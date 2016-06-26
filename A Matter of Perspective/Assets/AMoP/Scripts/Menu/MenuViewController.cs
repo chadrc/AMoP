@@ -6,6 +6,11 @@ public class MenuViewController : MonoBehaviour
 {
     private CanvasGroup canvasGroup;
 
+    public void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
@@ -26,6 +31,6 @@ public class MenuViewController : MonoBehaviour
 
     private void OnGameEnd()
     {
-        canvasGroup.gameObject.SetActive(true);
+
     }
 }
