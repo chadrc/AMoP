@@ -5,55 +5,58 @@ public class AMoPMenuItem: MonoBehaviour {
     public static string BaseDataPath = "Assets/AMoP/Data/";
     
     [MenuItem("AMoP/Create Board Data")]
-    public static void CreateBoardData()
+    public static BoardData CreateBoardData()
     {
-        CreateDataSO<BoardData>("Boards/BoardData.asset");
+        return CreateDataSO<BoardData>("Boards/BoardData.asset");
     }
 
     [MenuItem("AMoP/Create Board Node Factory")]
-    public static void CreateBoardNodeFactory()
+    public static BoardNodeFactory CreateBoardNodeFactory()
     {
-        CreateDataSO<BoardNodeFactory>("Board Node Factories/BoardNodeFactory.asset");
+        return CreateDataSO<BoardNodeFactory>("Board Node Factories/BoardNodeFactory.asset");
     }
 
     [MenuItem("AMoP/Create Energy Factory")]
-    public static void CreateEnergyFactory()
+    public static EnergyFactory CreateEnergyFactory()
     {
-        CreateDataSO<EnergyFactory>("Energy Factories/EnergyFactory.asset");
+        return CreateDataSO<EnergyFactory>("Energy Factories/EnergyFactory.asset");
     }
 
     [MenuItem("AMoP/Create Board Series")]
-    public static void CreateBoardSeries()
+    public static BoardSeries CreateBoardSeries()
     {
-        CreateDataSO<BoardSeries>("Board Series/Series.asset");
+        return CreateDataSO<BoardSeries>("Board Series/Series.asset");
     }
 
     [MenuItem("AMoP/Create Board Series List")]
-    public static void CreateBoardSeriesList()
+    public static BoardSeriesList CreateBoardSeriesList()
     {
+        BoardSeriesList list = null;
         try
         {
-            CreateUniqueDataSO<BoardSeriesList>("BoardSeriesList.asset");
+            list = CreateUniqueDataSO<BoardSeriesList>("BoardSeriesList.asset");
         } catch (System.Exception)
         {
             Debug.LogError("Cannot create more than one Board Series List.");
         }
+        return list;
     }
 
-    private static void CreateDataSO<T>(string path) where T : ScriptableObject
+    private static T CreateDataSO<T>(string path) where T : ScriptableObject
     {
-        CreateSO<T>(AssetDatabase.GenerateUniqueAssetPath(BaseDataPath + path));
+        return CreateSO<T>(AssetDatabase.GenerateUniqueAssetPath(BaseDataPath + path));
     }
 
-    private static void CreateUniqueDataSO<T>(string path) where T : ScriptableObject
+    private static T CreateUniqueDataSO<T>(string path) where T : ScriptableObject
     {
-        CreateSO<T>(BaseDataPath + path);
+        return CreateSO<T>(BaseDataPath + path);
     }
 
-    private static void CreateSO<T>(string path) where T : ScriptableObject
+    public static T CreateSO<T>(string path) where T : ScriptableObject
     {
         T data = ScriptableObject.CreateInstance<T>();
         AssetDatabase.CreateAsset(data, path);
         Selection.activeObject = data;
+        return data;
     }
 }

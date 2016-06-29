@@ -14,6 +14,18 @@ public class BoardData : ScriptableObject
     [SerializeField]
     private List<BoardNodeData> nodes = new List<BoardNodeData>();
     public List<BoardNodeData> Nodes { get { return new List<BoardNodeData>(nodes); } }
+
+    public void AddNode()
+    {
+        if (nodes.Count < 6 * 6 * 6)
+        {
+            nodes.Add(new BoardNodeData());
+        }
+        else
+        {
+            throw new System.InvalidOperationException("Cannot have more than " + 6 * 6 * 6 + " nodes in a board.");
+        }
+    }
 }
 
 public enum BoardNodeType
@@ -38,17 +50,69 @@ public class BoardNodeData
 {
     [SerializeField]
     private Vector3 position = new Vector3(0,0,0);
-    public Vector3 Position { get { return position; } }
+    public Vector3 Position
+    {
+        get
+        {
+            return position;
+        }
+
+        set
+        {
+            if (value.x >= 0 && value.x < 6
+                && value.y >= 0 && value.y < 6
+                && value.z >= 0 && value.z < 6)
+            {
+                position = value;
+            }
+        }
+    }
 
     [SerializeField]
     private BoardNodeType type = BoardNodeType.Basic;
-    public BoardNodeType Type { get { return type; } }
+    public BoardNodeType Type
+    {
+        get
+        {
+            return type;
+        }
+
+        set
+        {
+            type = value;
+        }
+    }
 
     [SerializeField]
     private float startingEnergy;
-    public float StartingEnergy { get { return startingEnergy; } }
+    public float StartingEnergy
+    {
+        get
+        {
+            return startingEnergy;
+        }
+
+        set
+        {
+            if (value >= 0)
+            {
+                startingEnergy = value;
+            }
+        }
+    }
 
     [SerializeField]
     private BoardNodeAffiliation affiliation = BoardNodeAffiliation.Neutral;
-    public BoardNodeAffiliation Affiliation { get { return affiliation; } }
+    public BoardNodeAffiliation Affiliation
+    {
+        get
+        {
+            return affiliation;
+        }
+
+        set
+        {
+            affiliation = value;
+        }
+    }
 }
