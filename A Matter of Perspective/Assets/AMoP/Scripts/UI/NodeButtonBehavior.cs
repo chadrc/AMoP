@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField]
     private Image graphic;
@@ -80,16 +80,6 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerDownHandler, IPointerUp
     public void Unhover()
     {
         Hide();
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Controller.ButtonDown(this, eventData);
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        Controller.ButtonUp(this, eventData);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

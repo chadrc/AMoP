@@ -8,71 +8,31 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 {
     [SerializeField]
     private GameObject nodeButtonPrefab;
-    
-    public event Action<NodeButtonBehavior> NodeButtonPointerDown;
-    public event Action<NodeButtonBehavior> NodeButtonPointerUp;
-    public event Action<NodeButtonBehavior> NodeButtonPointerEnter;
-    public event Action<NodeButtonBehavior> NodeButtonPointerExit;
+
+    // (Down button, Up button, direction)
+    public event Action<NodeButtonBehavior, NodeButtonBehavior, Vector2> NodeSwipeOccurred;
 
     // Sends cardinal direction of swipe;
     public event Action<Vector2> SwipeOccurred;
 
+    private Board board;
     private List<NodeButtonBehavior> nodeButtons = new List<NodeButtonBehavior>();
     private NodeButtonBehavior lastEnter;
+    private NodeButtonBehavior downButton;
     
     // Swipe Calculation Variables
     private Vector2 pointDown;
+
+    public void Init(Board board)
+    {
+        this.board = board;
+    }
 
     // Use this for initialization
     void Awake ()
     {
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         StartCoroutine(initialize());
-    }
-
-    public void ButtonDown(NodeButtonBehavior button, PointerEventData eventData)
-    {
-        if (NodeButtonPointerDown != null)
-        {
-            NodeButtonPointerDown(button);
-        }
-        pointDown = eventData.position;
-        lastEnter = button;
-    }
-
-    public void ButtonUp(NodeButtonBehavior button, PointerEventData eventData)
-    {
-        if (lastEnter != null && NodeButtonPointerUp != null)
-        {
-            NodeButtonPointerUp(lastEnter);
-        }
-        else
-        {
-            RaiseSwipeOccurred(eventData);
-        }
-        lastEnter = null;
-    }
-
-    public void ButtonEnter(NodeButtonBehavior button, PointerEventData eventData)
-    {
-        lastEnter = button;
-        if (NodeButtonPointerEnter != null)
-        {
-            NodeButtonPointerEnter(button);
-        }
-    }
-
-    public void ButtonExit(NodeButtonBehavior button, PointerEventData eventData)
-    {
-        if (lastEnter == button)
-        {
-            lastEnter = null;
-        }
-
-        if (NodeButtonPointerExit != null)
-        {
-            NodeButtonPointerExit(button);
-        }
     }
 
     private void onScreenChanged(int width, int height)
@@ -124,14 +84,95 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         nodeButtons.Add(behavior);
     }
 
+    public void ButtonEnter(NodeButtonBehavior button, PointerEventData data)
+    {
+        lastEnter = button;
+        var node = board.GetNode(button.XIndex, button.YIndex);
+        if (node != null && button != downButton)
+        {
+            if (downButton != null && node.CanReceive)
+            {
+                lastEnter.Hover();
+            }
+            else if (node.Affiliation == BoardNodeAffiliation.Player && node.CanSend)
+            {
+                lastEnter.Hover();
+            }
+        }
+    }
+
+    public void ButtonExit(NodeButtonBehavior button, PointerEventData data)
+    {
+        if (lastEnter != null && lastEnter != downButton)
+        {
+            lastEnter.Unhover();
+        }
+
+        if (lastEnter == button)
+        {
+            lastEnter = null;
+        }
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         pointDown = eventData.position;
+        if (lastEnter == null)
+        {
+            return;
+        }
+
+        var node = board.GetNode(lastEnter.XIndex, lastEnter.YIndex);
+        if (node != null && node.Affiliation == BoardNodeAffiliation.Player && node.CanSend)
+        {
+            downButton = lastEnter;
+            downButton.Select();
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        RaiseSwipeOccurred(eventData);
+        if (downButton != null)
+        {
+            if (lastEnter != null)
+            {
+                lastEnter.Unhover();
+
+                if (downButton != lastEnter)
+                {
+                    var node = board.GetNode(lastEnter.XIndex, lastEnter.YIndex);
+                    if (node != null)
+                    {
+                        if (NodeSwipeOccurred != null)
+                        {
+                            NodeSwipeOccurred(downButton, lastEnter, MathUtils.ClosestCardinal(eventData.position - pointDown));
+                        }
+                    }
+                    else
+                    {
+                        //RaiseSwipeOccurred(eventData);
+                    }
+                    downButton.Deselect();
+                }
+                else
+                {
+                    downButton.Hover();
+                    lastEnter = downButton;
+                    //RaiseSwipeOccurred(eventData);
+                }
+            }
+            else
+            {
+                downButton.Deselect();
+                //RaiseSwipeOccurred(eventData);
+            }
+        }
+        else
+        {
+            RaiseSwipeOccurred(eventData);
+        }
+        
+        downButton = null;
     }
 
     private void RaiseSwipeOccurred(PointerEventData eventData)

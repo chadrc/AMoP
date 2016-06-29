@@ -76,6 +76,8 @@ public class LevelBehavior : MonoBehaviour
             node.Affiliation.Changed += OnNodeAffiliationChanged;
         }
 
+        buttonController.Init(CurrentBoard);
+
         playing = true;
         if (GameStart != null)
         {
@@ -135,10 +137,7 @@ public class LevelBehavior : MonoBehaviour
     {
         // UI Events
         EnergyPoolManager = new EnergyPoolManager(energyFactory);
-        buttonController.NodeButtonPointerDown += OnNodeButtonDown;
-        buttonController.NodeButtonPointerUp += OnNodeButtonUp;
-        buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
-        buttonController.NodeButtonPointerExit += OnNodeButtonExit;
+        buttonController.NodeSwipeOccurred += OnNodeSwipeOccurred;
         buttonController.SwipeOccurred += OnSwipeOccurred;
     }
 
@@ -152,11 +151,6 @@ public class LevelBehavior : MonoBehaviour
 
     void OnDestory()
     {
-        buttonController.NodeButtonPointerDown -= OnNodeButtonDown;
-        buttonController.NodeButtonPointerUp -= OnNodeButtonUp;
-        buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
-        buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
-        buttonController.SwipeOccurred -= OnSwipeOccurred;
         CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
     }
 
@@ -179,95 +173,12 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
-    void OnNodeButtonDown(NodeButtonBehavior button)
+    void OnNodeSwipeOccurred(NodeButtonBehavior down, NodeButtonBehavior up, Vector2 dir)
     {
-        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player && node.CanSend)
-        {
-            button.Select();
-            selectedNode = node;
-            downButton = button;
-        }
-    }
+        var fromNode = CurrentBoard.GetNode(down.XIndex, down.YIndex);
+        var toNode = CurrentBoard.GetNode(up.XIndex, up.YIndex);
 
-    void OnNodeButtonUp(NodeButtonBehavior button)
-    {
-        if (selectedNode != null)
-        {
-            BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
-            // Hide selected node
-            downButton.Deselect();
-            // Keep hovered node highlighted after pointer up
-            if (selectedNode == node)
-            {
-                downButton.Hover();
-            }
-            else if (node != null)
-            {
-                // Figure direction of swipe
-                var sNodePos = selectedNode.Behavior.transform.position;
-                var nodePos = node.Behavior.transform.position;
-                Vector2 dir = MathUtils.ClosestCardinal(nodePos - sNodePos);
-                // Find node in that direction of selectedNode
-                float nodeX = selectedNode.Behavior.transform.position.x + 2.5f + dir.x; 
-                float nodeY = selectedNode.Behavior.transform.position.y + 2.5f + dir.y;
-
-                BoardNode adjacentNode = CurrentBoard.GetNode(Mathf.RoundToInt(nodeX), Mathf.RoundToInt(nodeY));
-                if (adjacentNode != null && adjacentNode != selectedNode)
-                {
-                    // Perform energy transfer
-                    selectedNode.SendEnergy(adjacentNode);
-                }
-            }
-            downButton = null;
-            selectedNode = null;
-        }
-        else if (downButton != null)
-        {
-            Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
-            CurrentBoard.Behavior.Spin(MathUtils.ClosestCardinal(dir));
-            downButton.Deselect();
-            downButton = null;
-            selectedNode = null;
-        }
-    }
-
-    void OnNodeButtonEnter(NodeButtonBehavior button)
-    {
-        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
-
-        // Nothing selected or is the same as previously selected
-        if (node == null || node == selectedNode)
-        {
-            return;
-        }
-
-        // If nothing previously selected 
-        if (selectedNode == null)
-        {
-            // Player owned node and is player node and node is flagged to send
-            if (node.Affiliation.Value == BoardNodeAffiliation.Player && node.CanSend)
-            {
-                button.Hover();
-            }
-        }
-        else // Node previously selected
-        { 
-            // adjacent node
-            if (Vector2.Distance(selectedNode.PerspectivePos, node.PerspectivePos) <= 1.25f && node.CanReceive)
-            {
-                button.Hover();
-            }
-        }
-    }
-
-    void OnNodeButtonExit(NodeButtonBehavior button)
-    {
-        BoardNode node = CurrentBoard.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node != selectedNode)
-        {
-            button.Unhover();
-        }
+        fromNode.SendEnergy(toNode);
     }
 
     void OnSwipeOccurred(Vector2 dir)
