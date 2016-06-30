@@ -29,9 +29,14 @@ public class BoardEditor : EditorWindow
         window.Show();
     }
 
-    void OnEnable()
+    void OnFocus()
     {
         loadBoardDatas();
+    }
+
+    void OnDestroy()
+    {
+
     }
 
     void OnGUI()
@@ -58,9 +63,18 @@ public class BoardEditor : EditorWindow
 
                 EditorGUILayout.LabelField(data.name);
                 if (GUILayout.Button("Load")) {
-                    boardData = data;
+                    loadBoard(data);
                 }
 
+                var oldClr = GUI.backgroundColor;
+                GUI.backgroundColor = Color.red;
+                if (GUILayout.Button("X", GUILayout.Width(20f)))
+                {
+                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(data));
+                    loadBoardDatas();
+                    return;
+                }
+                GUI.backgroundColor = oldClr;
                 EditorGUILayout.EndHorizontal();
             }
         }
@@ -68,7 +82,7 @@ public class BoardEditor : EditorWindow
         {
             if (GUILayout.Button("Unload"))
             {
-                boardData = null;
+                unloadBoard();
                 return;
             }
 
@@ -159,6 +173,11 @@ public class BoardEditor : EditorWindow
         }
     }
 
+    void OnProjectChanged()
+    {
+        loadBoardDatas();
+    }
+
     private void StatsTabState()
     {
 
@@ -186,7 +205,29 @@ public class BoardEditor : EditorWindow
     private void createBoard()
     {
         boardData = AMoPMenuItem.CreateBoardData();
+        loadBoardDatas();
+    }
 
+    private void loadBoard(BoardData data)
+    {
+        boardData = data;
+        createSceneBoard();
+    }
+
+    private void unloadBoard()
+    {
+        boardData = null;
+        destorySceneBoard();
+    }
+
+    private void reloadScene()
+    {
+        destorySceneBoard();
+        createBoard();
+    }
+
+    private void createSceneBoard()
+    {
         var boardParent = GameObject.Find("BoardParent");
         if (boardParent == null)
         {
@@ -194,7 +235,37 @@ public class BoardEditor : EditorWindow
             boardParent = new GameObject("BoardParent");
         }
 
+        var nodes = boardData.Nodes;
         // Create edit nodes
+        int i = 0;
+        foreach (var node in nodes)
+        {
+            var obj = new GameObject();
+            obj.name = "Board Node: " + i.ToString("000");
+            obj.transform.SetParent(boardParent.transform);
+            var editNode = obj.AddComponent<EditorBoardNodeBehavior>();
+            editNode.data = node;
+            editNode.transform.position = node.Position;
+            i++;
+        }
+    }
+
+    private void destorySceneBoard()
+    {
+        var boardParent = GameObject.Find("BoardParent");
+        var destoryList = new List<GameObject>();
+
+        // Hack for destorying all child objects in edit mode
+        // DestroyImmediate in this loop ends up skipping every other node
+        foreach (Transform t in boardParent.transform)
+        {
+            destoryList.Add(t.gameObject);
+        }
+
+        foreach (var g in destoryList)
+        {
+            GameObject.DestroyImmediate(g);
+        }
     }
 
     private void addNewNode()

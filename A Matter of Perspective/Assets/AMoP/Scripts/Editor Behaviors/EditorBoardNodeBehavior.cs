@@ -5,9 +5,9 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 {
     public BoardNodeData data;
 
-    void Awake()
+    void OnDrawGizmos()
     {
-        // Should not exist in Play mode, only for editor
-        GameObject.Destroy(gameObject);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position, .75f);
     }
 }
