@@ -12,6 +12,8 @@ public class BoardEditor : EditorWindow
     private BoardEditorTabState tabState = BoardEditorTabState.Nodes;
     private Color highlightClr = new Color(.3f, .3f, .3f);
     private GUIStyle whiteText;
+    private Vector2 boardScrollPos;
+    private Vector2 nodeScrollPos;
 
     private enum BoardEditorTabState
     {
@@ -57,6 +59,7 @@ public class BoardEditor : EditorWindow
                 loadBoardDatas();
             }
 
+            boardScrollPos = EditorGUILayout.BeginScrollView(boardScrollPos);
             foreach(var data in boardDatas)
             {
                 EditorGUILayout.BeginHorizontal();
@@ -77,18 +80,21 @@ public class BoardEditor : EditorWindow
                 GUI.backgroundColor = oldClr;
                 EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.EndScrollView();
         }
         else
         {
-            if (GUILayout.Button("Unload"))
+            if (GUILayout.Button("Unload Board"))
             {
                 unloadBoard();
                 return;
             }
 
-            boardData.BoardName = EditorGUILayout.TextField("Board Name: ", boardData.BoardName);
-            EditorGUILayout.LabelField("Description:");
-            boardData.Description = EditorGUILayout.TextArea(boardData.Description, GUILayout.Height(50f));
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.PrefixLabel(boardData.name);
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
 
             var originalClr = GUI.backgroundColor;
             EditorGUILayout.BeginHorizontal();
@@ -101,6 +107,7 @@ public class BoardEditor : EditorWindow
                 {
                     tabState = e;
                 }
+                GUI.backgroundColor = originalClr;
             }
 
             EditorGUILayout.EndHorizontal();
@@ -129,43 +136,21 @@ public class BoardEditor : EditorWindow
             addNewNode();
         }
 
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField("Index", GUILayout.Width(40f));
-        EditorGUILayout.LabelField("Position", GUILayout.Width(130f));
-        EditorGUILayout.LabelField("Energy", GUILayout.Width(60f));
-        EditorGUILayout.LabelField("Type", GUILayout.Width(70f));
-        EditorGUILayout.LabelField("Affiliation", GUILayout.Width(70f));
-
-        EditorGUILayout.EndHorizontal();
+        AMoPEditorUtils.EditBoardNodeDataHeader();
 
         BoardNodeData deleteNode = null;
 
         int index = 0;
+        nodeScrollPos = EditorGUILayout.BeginScrollView(nodeScrollPos);
         foreach (var node in boardData.Nodes)
         {
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.LabelField(index.ToString("000") + ": ", GUILayout.Width(40f));
-            string[] posOptions = { "0", "1", "2", "3", "4", "5" };
-            int[] posOptionsVals = { 0, 1, 2, 3, 4, 5 };
-            int x = EditorGUILayout.IntPopup((int)node.Position.x, posOptions, posOptionsVals, GUILayout.Width(40f));
-            int y = EditorGUILayout.IntPopup((int)node.Position.y, posOptions, posOptionsVals, GUILayout.Width(40f));
-            int z = EditorGUILayout.IntPopup((int)node.Position.z, posOptions, posOptionsVals, GUILayout.Width(40f));
-            node.Position = new Vector3(x, y, z);
-            node.StartingEnergy = EditorGUILayout.FloatField(node.StartingEnergy, GUILayout.Width(60f));
-            node.Type = (BoardNodeType)EditorGUILayout.EnumPopup(node.Type, GUILayout.Width(70f));
-            node.Affiliation = (BoardNodeAffiliation)EditorGUILayout.EnumPopup(node.Affiliation, GUILayout.Width(70f));
-            var oldClr = GUI.backgroundColor;
-            GUI.backgroundColor = Color.red;
-            if (GUILayout.Button("X", GUILayout.Height(14f), GUILayout.Width(20f)))
+            if (AMoPEditorUtils.EditBoardNodeData(index.ToString("000") + ": ", node))
             {
                 deleteNode = node;
             }
-            GUI.backgroundColor = oldClr;
-            EditorGUILayout.EndHorizontal();
             index++;
         }
+        EditorGUILayout.EndScrollView();
 
         if (deleteNode != null)
         {
