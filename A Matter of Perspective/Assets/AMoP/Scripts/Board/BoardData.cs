@@ -5,11 +5,11 @@ public class BoardData : ScriptableObject
 {
     [SerializeField]
     private string boardName;
-    public string BoardName { get { return boardName; } }
+    public string BoardName { get { return boardName; } set { boardName = value; } }
 
     [SerializeField]
     private string description;
-    public string Description { get { return description; } }
+    public string Description { get { return description; } set { description = value; } }
 
     [SerializeField]
     private List<BoardNodeData> nodes = new List<BoardNodeData>();
@@ -25,6 +25,11 @@ public class BoardData : ScriptableObject
         {
             throw new System.InvalidOperationException("Cannot have more than " + 6 * 6 * 6 + " nodes in a board.");
         }
+    }
+
+    public void RemoveNode(BoardNodeData node)
+    {
+        nodes.Remove(node);
     }
 }
 
