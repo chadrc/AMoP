@@ -5,12 +5,17 @@ using System.Collections;
 public class LevelBehavior : MonoBehaviour
 {
     public static LevelBehavior Current { get; private set; }
+    public static event System.Action GameStart;
+    public static event System.Action GameEnd;
 
     [SerializeField]
     private BoardBehavior boardBehavior;
 
     [SerializeField]
-    private BoardData boardData;
+    private int boardSeriesIndex;
+
+    [SerializeField]
+    private int startingBoardIndex;
 
     [SerializeField]
     private BoardNodeFactory boardNodeFactory;
@@ -20,12 +25,101 @@ public class LevelBehavior : MonoBehaviour
 
     [SerializeField]
     private NodeButtonPanelViewController buttonController;
-
-    private Board board;
+    
     private BoardNode selectedNode;
-    public EnergyPoolManager EnergyPoolManager { get; private set; }
-
     private NodeButtonBehavior downButton;
+    private bool playing = false;
+
+    public Board CurrentBoard { get; private set; }
+    public EnergyPoolManager EnergyPoolManager { get; private set; }
+    public float GameTime { get; private set; }
+    public bool HasNextLevel
+    {
+        get
+        {
+            var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
+            return startingBoardIndex+1 < boardSeries.Count;
+        }
+    }
+    public bool HasNextSeries { get { return boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
+
+    public void StartGame(int seriesIndex, int boardIndex)
+    {
+        boardSeriesIndex = seriesIndex;
+        startingBoardIndex = boardIndex;
+        StartGame();
+    }
+
+    public void StartGame()
+    {
+        Time.timeScale = 1.0f;
+        EnergyPoolManager.HideAllEnergy();
+        DestroyBoard();
+
+        GameTime = 0;
+        var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
+        if (boardSeries == null)
+        {
+            Debug.LogError("No series with index " + boardSeriesIndex);
+            return;
+        }
+        var boardData = boardSeries.GetBoard(startingBoardIndex);
+        if (boardData == null)
+        {
+            Debug.LogError("No board data in series " + boardSeriesIndex + " with index " + startingBoardIndex);
+            return;
+        }
+        CurrentBoard = new Board(boardData, boardBehavior, boardNodeFactory);
+        CurrentBoard.Behavior.SpinEnd += OnSpinEnd;
+        foreach (var node in CurrentBoard)
+        {
+            node.Affiliation.Changed += OnNodeAffiliationChanged;
+        }
+
+        buttonController.Init(CurrentBoard);
+
+        playing = true;
+        if (GameStart != null)
+        {
+            GameStart();
+        }
+    }
+
+    public bool AdvanceToNextLevel()
+    {
+        if (HasNextLevel)
+        {
+            startingBoardIndex++;
+        }
+        else if (HasNextSeries)
+        {
+            boardSeriesIndex++;
+            startingBoardIndex = 0;
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void DestroyBoard()
+    {
+        if (CurrentBoard == null)
+        {
+            return;
+        }
+
+        foreach (var node in CurrentBoard)
+        {
+            node.Affiliation.Changed -= OnNodeAffiliationChanged;
+            GameObject.Destroy(node.Behavior.gameObject);
+        }
+        CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
+        CurrentBoard.Behavior.Uninit();
+        CurrentBoard = null;
+    }
 
     void Awake()
     {
@@ -39,100 +133,63 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
-	// Use this for initialization
-	void Start ()
+    void Start()
     {
+        // UI Events
         EnergyPoolManager = new EnergyPoolManager(energyFactory);
-        board = new Board(boardData, boardBehavior, boardNodeFactory);
-        board.Behavior.SpinEnd += OnSpinEnd;
-        buttonController.NodeButtonPointerDown += OnNodeButtonDown;
-        buttonController.NodeButtonPointerUp += OnNodeButtonUp;
-        buttonController.NodeButtonPointerEnter += OnNodeButtonEnter;
-        buttonController.NodeButtonPointerExit += OnNodeButtonExit;
+        buttonController.NodeSwipeOccurred += OnNodeSwipeOccurred;
         buttonController.SwipeOccurred += OnSwipeOccurred;
-	}
-
-    void OnDestroy()
-    {
-        buttonController.NodeButtonPointerDown -= OnNodeButtonDown;
-        buttonController.NodeButtonPointerUp -= OnNodeButtonUp;
-        buttonController.NodeButtonPointerEnter -= OnNodeButtonEnter;
-        buttonController.NodeButtonPointerExit -= OnNodeButtonExit;
-        buttonController.SwipeOccurred -= OnSwipeOccurred;
-        board.Behavior.SpinEnd -= OnSpinEnd;
     }
 
-    void OnNodeButtonDown(NodeButtonBehavior button)
+    void Update()
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node.Affiliation.Value == BoardNodeAffiliation.Player)
+        if (playing)
         {
-            button.Select();
-            selectedNode = node;
-            downButton = button;
+            GameTime += Time.deltaTime;
         }
     }
 
-    void OnNodeButtonUp(NodeButtonBehavior button)
+    void OnDestory()
     {
-        if (selectedNode != null)
+        CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
+    }
+
+    void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
+    {
+        foreach (var node in CurrentBoard)
         {
-            BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-            // Hide selected node
-            downButton.Deselect();
-            // Keep hovered node highlighted after pointer up
-            if (selectedNode == node)
+            // If any node doesn't equal new affiliation, board still needs to be filled
+            if (node.CanReceive && node.Affiliation != affiliation)
             {
-                downButton.Hover();
+                return;
             }
-            else if (node != null)
-            {
-                // Figure direction of swipe
-                var sNodePos = selectedNode.Behavior.transform.position;
-                var nodePos = node.Behavior.transform.position;
-                Vector2 dir = MathUtils.ClosestCardinal(nodePos - sNodePos);
-                // Find node in that direction of selectedNode
-                BoardNode adjacentNode = board.GetNode(
-                    (int)(selectedNode.Behavior.transform.position.x + 2.5f + dir.x), 
-                    (int)(selectedNode.Behavior.transform.position.y + 2.5f + dir.y));
-                if (adjacentNode != null)
-                {
-                    // Perform energy transfer
-                    selectedNode.SendEnergy(adjacentNode);
-                }
-            }
-            selectedNode = null;
         }
-        else if (downButton != null)
+
+        // Clean up resources
+        playing = false;
+        if (GameEnd != null)
         {
-            Vector2 dir = new Vector2(button.XIndex - downButton.XIndex, button.YIndex - downButton.YIndex).normalized;
-            board.Behavior.Spin(MathUtils.ClosestCardinal(dir));
-            downButton.Deselect();
-            downButton = null;
+            GameEnd();
         }
     }
 
-    void OnNodeButtonEnter(NodeButtonBehavior button)
+    void OnNodeSwipeOccurred(NodeButtonBehavior down, NodeButtonBehavior up, Vector2 dir)
     {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && (selectedNode != null || node.Affiliation.Value == BoardNodeAffiliation.Player) && node != selectedNode)
-        {
-            button.Hover();
-        }
-    }
+        var fromNode = CurrentBoard.GetNode(down.XIndex, down.YIndex);
+        var toNode = CurrentBoard.GetNode(up.XIndex, up.YIndex);
 
-    void OnNodeButtonExit(NodeButtonBehavior button)
-    {
-        BoardNode node = board.GetNode(button.XIndex, button.YIndex);
-        if (node != null && node != selectedNode)
-        {
-            button.Unhover();
-        }
+        fromNode.SendEnergy(toNode);
     }
 
     void OnSwipeOccurred(Vector2 dir)
     {
-        board.Behavior.Spin(dir);
+        CurrentBoard.Behavior.Spin(dir);
+        if (downButton != null)
+        {
+            downButton.Deselect();
+            downButton = null;
+        }
+        selectedNode = null;
     }
 
     void OnSpinEnd()

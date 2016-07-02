@@ -25,7 +25,7 @@ public class BoardNodeFactory : ScriptableObject
     {
         GameObject prefab = null;
         BoardNode node = null;
-
+        #pragma warning disable 0162
         switch (data.Type)
         {
             case BoardNodeType.Basic:
@@ -35,14 +35,17 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Block:
                 prefab = BlockBoardNodePrefab;
+                throw new System.NotImplementedException("Block board node not implemented.");
                 break;
 
             case BoardNodeType.Moving:
                 prefab = MovingBoardNodePrefab;
+                throw new System.NotImplementedException("Moving board node not implemented.");
                 break;
 
             case BoardNodeType.Null:
                 prefab = NullBoardNodePrefab;
+                node = new NullBoardNode(data);
                 break;
 
             case BoardNodeType.Pool:
@@ -52,8 +55,10 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Vortex:
                 prefab = VortexBoardNodePrefab;
+                throw new System.NotImplementedException("Vortex board node not implemented.");
                 break;
         }
+        #pragma warning restore 0162
 
         var nodeObj = GameObject.Instantiate(prefab) as GameObject;
         var behavior = nodeObj.GetComponent<BoardNodeBehavior>();

@@ -7,6 +7,13 @@ public abstract class BoardNode
     
     public BoardNodeBehavior Behavior { get; private set; }
     public Board ParentBoard { get; private set; }
+    public Vector2 PerspectivePos
+    {
+        get
+        {
+            return new Vector2(Behavior.transform.position.x, Behavior.transform.position.y);
+        }
+    }
 
     public Property<Vector3> Position { get; protected set; }
     public Property<BoardNodeType> Type { get; protected set; }
@@ -29,6 +36,16 @@ public abstract class BoardNode
     ~BoardNode()
     {
         DetachFromBehavior();
+    }
+
+    public void Enable()
+    {
+        Behavior.EnergyCollider.enabled = true;
+    }
+
+    public void Disable()
+    {
+        Behavior.EnergyCollider.enabled = false;
     }
 
     public void SetBoard(Board board)
@@ -93,14 +110,16 @@ public abstract class BoardNode
 
     private IEnumerator DoSendEnergy(BoardNode to)
     {
-        int toSend = (int)Energy.Value;
+        int toSend = Mathf.RoundToInt(Energy.Value);
         var range = new Range(toSend);
-        foreach(var i in range)
+        #pragma warning disable 0168
+        foreach (var i in range)
         {
             Behavior.SendEnergy(to);
             Energy.Value--;
             yield return new WaitForSeconds(.1f);
         }
+        #pragma warning restore 0168
     }
 
     private IEnumerator UpdateRoutine()

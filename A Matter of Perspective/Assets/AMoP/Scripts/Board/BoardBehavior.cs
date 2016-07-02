@@ -13,6 +13,11 @@ public class BoardBehavior : MonoBehaviour {
         HideShowNodes();
     }
 
+    public void Uninit()
+    {
+        BoardObject = null;
+    }
+
     public void Spin(Vector2 dir)
     {
         if (canSpin)
@@ -36,11 +41,13 @@ public class BoardBehavior : MonoBehaviour {
                 if (boardRow.Closest != null)
                 {
                     boardRow.Closest.Behavior.NoFade();
+                    boardRow.Closest.Enable();
                 }
 
                 foreach (var node in boardRow.Hidden)
                 {
                     node.Behavior.FullFade();
+                    node.Disable();
                 }
             }
         }

@@ -1,40 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class BoardNodeBehavior : MonoBehaviour
+[RequireComponent (typeof(SphereCollider))]
+public abstract class BoardNodeBehavior : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject graphicObject;
-
     public BoardNode Node { get; private set; }
-
+    public SphereCollider EnergyCollider { get; private set; }
     public event System.Action<EnergyBehavior> EnergyEnter;
 
-    new private MeshRenderer renderer;
-    private Vector3 minScale = new Vector3(.25f, .25f, .25f);
-    private Vector3 maxScale = new Vector3(.75f, .75f, .75f);
-
-    public void HalfFade()
-    {
-        setRendererAlpha(.5f);
-    }
-
-    public void FullFade()
-    {
-        setRendererAlpha(0);
-    }
-
-    public void NoFade()
-    {
-        setRendererAlpha(1.0f);
-    }
-
-    public void AttachToNode(BoardNode node)
+    public virtual void AttachToNode(BoardNode node)
     {
         DetachFromNode();
 
-        // 2.5 is the center of 6 unit spheres
+        // 2.5 is 3 (half of board size 6) minus .5 (offset to nodes default position at the origin)
         // subtract it from all nodes to center board on screen
+        EnergyCollider = GetComponent<SphereCollider>();
         Vector3 pos = node.Position - new Vector3(2.5f, 2.5f, 2.5f);
         transform.position = pos;
 
@@ -42,8 +21,8 @@ public class BoardNodeBehavior : MonoBehaviour
         node.Affiliation.Changed += OnNodeAffiliationChanged;
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
-        Resize();
-        ChangeColor();
+        OnNodeEnergyChanged(node.Energy);
+        OnNodeAffiliationChanged(node.Affiliation);
     }
 
     public void DetachFromNode()
@@ -58,72 +37,34 @@ public class BoardNodeBehavior : MonoBehaviour
         Node.Energy.Changed -= OnNodeEnergyChanged;
     }
 
-    public void SendEnergy(BoardNode to)
+    public void HalfFade()
     {
-        var energy = LevelBehavior.Current.EnergyPoolManager.GetOneEnergy(Node.Affiliation);
-        energy.Travel(Node, to);
+        setAlpha(.5f);
     }
 
-    private void setRendererAlpha(float a)
+    public void FullFade()
     {
-        var clr = renderer.material.color;
-        clr.a = a;
-        renderer.material.color = clr;
+        setAlpha(0);
     }
 
-    private void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
+    public void NoFade()
     {
-        ChangeColor();
+        setAlpha(1.0f);
     }
 
-    private void OnNodeTypeChanged(BoardNodeType type)
-    {
+    public abstract void SendEnergy(BoardNode to);
+    protected abstract void setAlpha(float a);
+    protected abstract void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation);
+    protected abstract void OnNodeTypeChanged(BoardNodeType type);
+    protected abstract void OnNodeEnergyChanged(float energy);
 
-    }
-
-    private void OnNodeEnergyChanged(float energy)
-    {
-        Resize();
-    }
-
-    private void Resize()
-    {
-        graphicObject.transform.localScale = Vector3.Lerp(minScale, maxScale, Node.Energy / 20f);
-    }
-
-    private void ChangeColor()
-    {
-        switch (Node.Affiliation.Value)
-        {
-            case BoardNodeAffiliation.Player:
-                renderer.material.color = Color.cyan;
-                break;
-
-            case BoardNodeAffiliation.Enemy:
-                renderer.material.color = new Color(1.0f, 1.0f, 0);
-                break;
-
-            case BoardNodeAffiliation.Neutral:
-                renderer.material.color = Color.white;
-                break;
-        }
-    }
-
-	// Use this for initialization
-	void Awake ()
-    {
-        renderer = transform.GetChild(0).GetComponent<MeshRenderer>();
-    }
+    // Use this for initialization
+    protected abstract void Awake();
     
     void OnDestroy()
     {
         DetachFromNode();
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
     void OnTriggerEnter(Collider collider)
     {
