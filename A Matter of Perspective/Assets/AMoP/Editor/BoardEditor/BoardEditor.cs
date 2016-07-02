@@ -28,6 +28,7 @@ public class BoardEditor : EditorWindow
     {
         // Get existing open window or if none, make a new one:
         var window = (BoardEditor)EditorWindow.GetWindow(typeof(BoardEditor));
+		window.name = "Board Editor";
         window.Show();
     }
 
@@ -38,7 +39,7 @@ public class BoardEditor : EditorWindow
 
     void OnDestroy()
     {
-
+		unloadBoard ();
     }
 
     void OnGUI()
