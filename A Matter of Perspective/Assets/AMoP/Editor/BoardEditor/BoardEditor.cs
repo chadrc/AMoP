@@ -240,7 +240,8 @@ public class BoardEditor : EditorWindow
 
     private void createSceneBoard()
     {
-        var boardParent = GameObject.Find("BoardParent");
+		var boardParent = GameObject.Find("BoardParent");
+		boardParent.transform.rotation = Quaternion.identity;
         if (boardParent == null)
         {
             Debug.Log("Creating board parent.");
@@ -278,6 +279,8 @@ public class BoardEditor : EditorWindow
         {
             GameObject.DestroyImmediate(g);
         }
+
+		boardParent.transform.rotation = Quaternion.identity;
     }
 
     private void addNewNode()

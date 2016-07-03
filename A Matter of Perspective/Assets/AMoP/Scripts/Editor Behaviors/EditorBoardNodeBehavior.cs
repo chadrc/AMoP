@@ -37,7 +37,7 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	{
 		gameObject.name = "Board Node: " + index;
 		nodeIndex = index;
-		this.transform.position = Data.Position;
+		this.transform.localPosition = Data.Position - new Vector3(2.5f, 2.5f, 2.5f);
 	}
 
 	public void InspectorEdited(bool delete = false)

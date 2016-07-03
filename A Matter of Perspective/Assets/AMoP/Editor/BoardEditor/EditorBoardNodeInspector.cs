@@ -141,7 +141,7 @@ public class EditorBoardNodeInspector : Editor
 		return value;
 	}
 
-	private static void drawBoardRotator()
+	private void drawBoardRotator()
 	{
 		var sceneViewRect = EditorWindow.GetWindow<SceneView> ().camera.pixelRect;
 		var controlRect = new Rect (
@@ -169,7 +169,7 @@ public class EditorBoardNodeInspector : Editor
 		GUILayout.FlexibleSpace ();
 		if (GUILayout.Button ("Up", GUILayout.Width(40f)))
 		{
-			Debug.Log ("Rotate Up");
+			rotateBoardParent (Vector2.up);
 		}
 		GUILayout.FlexibleSpace ();
 		EditorGUILayout.EndHorizontal ();
@@ -177,12 +177,12 @@ public class EditorBoardNodeInspector : Editor
 		EditorGUILayout.BeginHorizontal ();
 		if (GUILayout.Button ("Right", GUILayout.Width(40f)))
 		{
-			Debug.Log ("Rotate Right");
+			rotateBoardParent (Vector2.right);
 		}
 
 		if (GUILayout.Button ("Left", GUILayout.Width(40f)))
 		{
-			Debug.Log ("Rotate Left");
+			rotateBoardParent (Vector2.left);
 		}
 		EditorGUILayout.EndHorizontal ();
 
@@ -190,7 +190,7 @@ public class EditorBoardNodeInspector : Editor
 		GUILayout.FlexibleSpace ();
 		if (GUILayout.Button ("Down", GUILayout.Width(40f)))
 		{
-			Debug.Log ("Rotate Down");
+			rotateBoardParent (Vector2.down);
 		}
 		GUILayout.FlexibleSpace ();
 		EditorGUILayout.EndHorizontal ();
@@ -202,7 +202,7 @@ public class EditorBoardNodeInspector : Editor
 		GUILayout.EndArea ();
 	}
 
-	private static void drawLegend()
+	private void drawLegend()
 	{
 		var typeArray = (BoardNodeType[])Enum.GetValues (typeof(BoardNodeType));
 		float legendHeight = typeArray.Length * legendItemHeight;
@@ -248,7 +248,7 @@ public class EditorBoardNodeInspector : Editor
 		}
 	}
 
-	private static Texture2D MakeTex(int width, int height, Color col)
+	private Texture2D MakeTex(int width, int height, Color col)
 	{
 		Color[] pix = new Color[width*height];
 
@@ -260,5 +260,17 @@ public class EditorBoardNodeInspector : Editor
 		result.Apply();
 
 		return result;
+	}
+
+	private void rotateBoardParent(Vector2 dir)
+	{
+		var boardParent = GameObject.Find ("BoardParent");
+		if (boardParent == null)
+		{
+			Debug.LogError ("No object named BoardParent to rotate.");
+		}
+
+		boardParent.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
+		boardParent.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
 	}
 }
