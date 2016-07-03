@@ -23,13 +23,20 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	public BoardNodeData Data { get { return GetBoardNodeData == null ? null : GetBoardNodeData(NodeIndex); } }
 	public int NodeIndex { get { return nodeIndex; } }
 
+	private Vector3 truePos { get { return Data.Position - new Vector3 (2.5f, 2.5f, 2.5f); } }
+
+	// Mimic min and max scale of basic board node
+	private const float minSize = .5f * .25f;
+	private const float maxSize = .5f * .75f;
+
     void OnDrawGizmos()
 	{
 		if (Data != null)
 		{
 			var clr = TypeColorMap [Data.Type];
 			Gizmos.color = clr;
-			Gizmos.DrawSphere(transform.position, .5f);
+			float size = Mathf.Lerp (minSize, maxSize, Data.StartingEnergy / 20f);
+			Gizmos.DrawSphere(transform.position, size);
 		}
     }
 
@@ -37,12 +44,12 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	{
 		gameObject.name = "Board Node: " + index;
 		nodeIndex = index;
-		this.transform.localPosition = Data.Position - new Vector3(2.5f, 2.5f, 2.5f);
+		this.transform.localPosition = truePos;
 	}
 
 	public void InspectorEdited(bool delete = false)
 	{
-		this.transform.position = Data.Position;
+		this.transform.position = truePos;
 		if (Edited != null)
 		{
 			Edited (this, delete);

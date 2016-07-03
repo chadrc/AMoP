@@ -258,7 +258,6 @@ public class BoardEditor : EditorWindow
             var editNode = obj.AddComponent<EditorBoardNodeBehavior>();
 			editNodes.Add (editNode);
 			editNode.SetData (i);
-            i++;
         }
     }
 
@@ -308,7 +307,6 @@ public class BoardEditor : EditorWindow
 			for (int i=0; i<editNodes.Count; i++)
 			{
 				editNodes [index].SetData (index);
-				index++;
 			}
 		}
 		EditorUtility.SetDirty (this);

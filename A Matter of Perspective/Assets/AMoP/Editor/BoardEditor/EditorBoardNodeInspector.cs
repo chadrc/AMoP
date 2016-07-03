@@ -117,6 +117,8 @@ public class EditorBoardNodeInspector : Editor
 		}
 
 		Handles.EndGUI ();
+
+		Handles.DrawWireDisc (node.transform.position, Vector3.back, .5f);
 	}
 
 	private float IncDecControl(String label, float value)
