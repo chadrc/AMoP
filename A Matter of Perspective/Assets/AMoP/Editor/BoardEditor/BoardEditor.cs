@@ -196,8 +196,12 @@ public class BoardEditor : EditorWindow
 	private void onSceneGUI(SceneView scene)
 	{
 		setupListeners ();
-		drawLegend ();
-		drawBoardRotator ();
+
+		if (boardData != null)
+		{
+			drawLegend ();
+			drawBoardRotator ();
+		}
 	}
 
 	private void setupListeners()
