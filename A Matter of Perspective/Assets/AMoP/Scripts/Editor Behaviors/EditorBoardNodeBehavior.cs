@@ -23,7 +23,7 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	public BoardNodeData Data { get { return GetBoardNodeData == null ? null : GetBoardNodeData(NodeIndex); } }
 	public int NodeIndex { get { return nodeIndex; } }
 
-	private Vector3 truePos { get { return Data.Position - new Vector3 (2.5f, 2.5f, 2.5f); } }
+	private Vector3 truePos { get { return Data == null ? Vector3.zero : Data.Position - new Vector3 (2.5f, 2.5f, 2.5f); } }
 
 	// Mimic min and max scale of basic board node
 	private const float minSize = .5f * .25f;
