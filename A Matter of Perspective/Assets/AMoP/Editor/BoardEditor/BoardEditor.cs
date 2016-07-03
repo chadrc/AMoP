@@ -14,6 +14,7 @@ public class BoardEditor : EditorWindow
     private GUIStyle whiteText;
     private Vector2 boardScrollPos;
     private Vector2 nodeScrollPos;
+	private List<EditorBoardNodeBehavior> editNodes;
 
     private enum BoardEditorTabState
     {
@@ -29,12 +30,14 @@ public class BoardEditor : EditorWindow
         // Get existing open window or if none, make a new one:
         var window = (BoardEditor)EditorWindow.GetWindow(typeof(BoardEditor));
 		window.name = "Board Editor";
+		SceneView.onSceneGUIDelegate += window.onSceneGUI;
         window.Show();
     }
 
     void OnFocus()
     {
-        loadBoardDatas();
+		loadBoardDatas();
+		setupListeners ();
     }
 
     void OnDestroy()
@@ -44,6 +47,8 @@ public class BoardEditor : EditorWindow
 
     void OnGUI()
     {
+		setupListeners ();
+
         // Can only call GUI functions from inside OnGUI
         whiteText = new GUIStyle(GUI.skin.button);
         whiteText.normal.textColor = new Color(.9f, .9f, .9f);
@@ -126,7 +131,7 @@ public class BoardEditor : EditorWindow
                 case BoardEditorTabState.Actions:
                     ActionsTabState();
                     break;
-            }
+			}
         }
     }
 
@@ -149,6 +154,13 @@ public class BoardEditor : EditorWindow
             {
                 deleteNode = node;
             }
+
+			bool deleted = deleteNode == node;
+			if (GUI.changed)
+			{
+				editNodes [index].InspectorEdited (deleted);
+			}
+
             index++;
         }
         EditorGUILayout.EndScrollView();
@@ -173,6 +185,20 @@ public class BoardEditor : EditorWindow
     {
 
     }
+
+	private void onSceneGUI(SceneView scene)
+	{
+		setupListeners ();
+	}
+
+	private void setupListeners()
+	{
+		if (EditorBoardNodeBehavior.GetBoardNodeData == null)
+		{
+			EditorBoardNodeBehavior.GetBoardNodeData += editNodeGetDataDelegate;
+			EditorBoardNodeBehavior.Edited += onNodeEdited;
+		}
+	}
 
     private void loadBoardDatas()
     {
@@ -209,7 +235,7 @@ public class BoardEditor : EditorWindow
     private void reloadScene()
     {
         destorySceneBoard();
-        createBoard();
+        createSceneBoard();
     }
 
     private void createSceneBoard()
@@ -221,17 +247,17 @@ public class BoardEditor : EditorWindow
             boardParent = new GameObject("BoardParent");
         }
 
+		editNodes = new List<EditorBoardNodeBehavior> ();
         var nodes = boardData.Nodes;
         // Create edit nodes
         int i = 0;
         foreach (var node in nodes)
         {
             var obj = new GameObject();
-            obj.name = "Board Node: " + i.ToString("000");
             obj.transform.SetParent(boardParent.transform);
             var editNode = obj.AddComponent<EditorBoardNodeBehavior>();
-            editNode.data = node;
-            editNode.transform.position = node.Position;
+			editNodes.Add (editNode);
+			editNode.SetData (i);
             i++;
         }
     }
@@ -258,4 +284,31 @@ public class BoardEditor : EditorWindow
     {
         boardData.AddNode();
     }
+
+	private BoardNodeData editNodeGetDataDelegate(int index)
+	{
+		if (boardData != null && index >= 0 && index < boardData.Nodes.Count)
+		{
+			return boardData.Nodes [index];
+		}
+		return null;
+	}
+
+	private void onNodeEdited(EditorBoardNodeBehavior editNode, bool delete)
+	{
+		if (delete)
+		{
+			boardData.RemoveNode (editNode.NodeIndex);
+			editNodes.Remove (editNode);
+			GameObject.DestroyImmediate (editNode.gameObject);
+
+			int index = 0;
+			foreach (var data in boardData.Nodes)
+			{
+				editNodes [index].SetData (index);
+				index++;
+			}
+		}
+		EditorUtility.SetDirty (this);
+	}
 }

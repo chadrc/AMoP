@@ -31,6 +31,11 @@ public class BoardData : ScriptableObject
     {
         nodes.Remove(node);
     }
+
+	public void RemoveNode(int index)
+	{
+		nodes.RemoveAt (index);
+	}
 }
 
 public enum BoardNodeType

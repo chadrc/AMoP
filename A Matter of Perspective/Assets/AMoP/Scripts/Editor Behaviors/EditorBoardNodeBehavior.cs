@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 public class EditorBoardNodeBehavior : MonoBehaviour
 {
+	public static System.Func<int, BoardNodeData> GetBoardNodeData;
+
+	public static event System.Action<EditorBoardNodeBehavior, bool> Edited;
+
 	public static Dictionary<BoardNodeType, Color> TypeColorMap = new Dictionary<BoardNodeType, Color> () 
 	{
 		{BoardNodeType.Basic, new Color(0, 1, 0)},
@@ -13,12 +17,35 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 		{BoardNodeType.Vortex, new Color(.5f, 0, .5f)},
 	};
 
-    public BoardNodeData data;
+	[SerializeField]
+	private int nodeIndex;
+
+	public BoardNodeData Data { get { return GetBoardNodeData == null ? null : GetBoardNodeData(NodeIndex); } }
+	public int NodeIndex { get { return nodeIndex; } }
 
     void OnDrawGizmos()
-    {
-		var clr = TypeColorMap [data.Type];
-        Gizmos.color = clr;
-        Gizmos.DrawSphere(transform.position, .5f);
+	{
+		if (Data != null)
+		{
+			var clr = TypeColorMap [Data.Type];
+			Gizmos.color = clr;
+			Gizmos.DrawSphere(transform.position, .5f);
+		}
     }
+
+	public void SetData(int index)
+	{
+		gameObject.name = "Board Node: " + index;
+		nodeIndex = index;
+		this.transform.position = Data.Position;
+	}
+
+	public void InspectorEdited(bool delete = false)
+	{
+		this.transform.position = Data.Position;
+		if (Edited != null)
+		{
+			Edited (this, delete);
+		}
+	}
 }
