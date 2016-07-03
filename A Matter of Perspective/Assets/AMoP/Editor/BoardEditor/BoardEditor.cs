@@ -251,8 +251,7 @@ public class BoardEditor : EditorWindow
 		editNodes = new List<EditorBoardNodeBehavior> ();
         var nodes = boardData.Nodes;
         // Create edit nodes
-        int i = 0;
-        foreach (var node in nodes)
+		for (int i=0; i<nodes.Count; i++)
         {
             var obj = new GameObject();
             obj.transform.SetParent(boardParent.transform);
@@ -306,7 +305,7 @@ public class BoardEditor : EditorWindow
 			GameObject.DestroyImmediate (editNode.gameObject);
 
 			int index = 0;
-			foreach (var data in boardData.Nodes)
+			for (int i=0; i<editNodes.Count; i++)
 			{
 				editNodes [index].SetData (index);
 				index++;
