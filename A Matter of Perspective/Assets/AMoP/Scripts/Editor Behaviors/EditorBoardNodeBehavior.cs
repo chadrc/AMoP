@@ -20,6 +20,12 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	[SerializeField]
 	private int nodeIndex;
 
+	[SerializeField]
+	private bool hidden;
+
+	[SerializeField]
+	private float alpha = 1.0f;
+
 	public BoardNodeData Data { get { return GetBoardNodeData == null ? null : GetBoardNodeData(NodeIndex); } }
 	public int NodeIndex { get { return nodeIndex; } }
 
@@ -31,9 +37,10 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 
     void OnDrawGizmos()
 	{
-		if (Data != null)
+		if (Data != null && !hidden)
 		{
 			var clr = TypeColorMap [Data.Type];
+			clr.a = alpha;
 			Gizmos.color = clr;
 			float size = Mathf.Lerp (minSize, maxSize, Data.StartingEnergy / 20f);
 			Gizmos.DrawSphere(transform.position, size);
@@ -49,10 +56,27 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 
 	public void InspectorEdited(bool delete = false)
 	{
-		this.transform.position = truePos;
+		this.transform.localPosition = truePos;
 		if (Edited != null)
 		{
 			Edited (this, delete);
 		}
+	}
+
+	public void Show()
+	{
+		hidden = false;
+		alpha = 1.0f;
+	}
+
+	public void Hide()
+	{
+		hidden = true;
+	}
+
+	public void Fade()
+	{
+		hidden = false;
+		alpha = .25f;
 	}
 }

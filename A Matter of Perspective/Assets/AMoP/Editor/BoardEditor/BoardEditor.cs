@@ -22,6 +22,7 @@ public class BoardEditor : EditorWindow
     private Vector2 boardScrollPos;
     private Vector2 nodeScrollPos;
 	private List<EditorBoardNodeBehavior> editNodes;
+	private bool sceneOrtho;
 
     private enum BoardEditorTabState
     {
@@ -45,6 +46,8 @@ public class BoardEditor : EditorWindow
 		SceneView.onSceneGUIDelegate += onSceneGUI;
 		loadBoardDatas();
 		setupListeners ();
+
+		checkSceneCam ();
     }
 
     void OnDestroy()
@@ -97,6 +100,8 @@ public class BoardEditor : EditorWindow
         }
         else
         {
+			checkSceneCam ();
+
             if (GUILayout.Button("Unload Board"))
             {
                 unloadBoard();
@@ -196,11 +201,25 @@ public class BoardEditor : EditorWindow
 	private void onSceneGUI(SceneView scene)
 	{
 		setupListeners ();
+		checkSceneCam ();
 
 		if (boardData != null)
 		{
 			drawLegend ();
 			drawBoardRotator ();
+		}
+	}
+
+	private void checkSceneCam()
+	{
+		var allCams = SceneView.GetAllSceneCameras ();
+		if (allCams.Length > 0)
+		{
+			if (sceneOrtho != allCams [0].orthographic)
+			{
+				sceneOrtho = allCams [0].orthographic;
+				hideShowNodes ();
+			}
 		}
 	}
 
@@ -272,7 +291,56 @@ public class BoardEditor : EditorWindow
 			editNodes.Add (editNode);
 			editNode.SetData (i);
         }
+
+		hideShowNodes ();
     }
+
+	private void showAllNodes()
+	{
+		for (int x = 0; x < 6; x++)
+		{
+			for (int y = 0; y < 6; y++)
+			{
+				var row = AMoPUtils.GetEditNodeRow (editNodes, x, y);
+				row.Closest.Show ();
+				foreach (var h in row.Hidden)
+				{
+					h.Show ();
+				}
+			}
+		}
+	}
+
+	private void hideShowNodes()
+	{
+		if (editNodes == null)
+		{
+			return;
+		}
+
+		for (int x = 0; x < 6; x++)
+		{
+			for (int y = 0; y < 6; y++)
+			{
+				var row = AMoPUtils.GetEditNodeRow (editNodes, x, y);
+				if (row.Closest != null)
+				{
+					row.Closest.Show ();
+				}
+				foreach (var h in row.Hidden)
+				{
+					if (sceneOrtho)
+					{
+						h.Hide ();
+					}
+					else
+					{
+						h.Fade ();
+					}
+				}
+			}
+		}
+	}
 
     private void destorySceneBoard()
     {
@@ -322,6 +390,8 @@ public class BoardEditor : EditorWindow
 				editNodes [index].SetData (index);
 			}
 		}
+
+		hideShowNodes ();
 		EditorUtility.SetDirty (this);
 	}
 
@@ -447,5 +517,7 @@ public class BoardEditor : EditorWindow
 
 		boardParent.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
 		boardParent.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
+
+		hideShowNodes ();
 	}
 }
