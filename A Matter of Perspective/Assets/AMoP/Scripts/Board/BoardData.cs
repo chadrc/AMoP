@@ -41,11 +41,12 @@ public class BoardData : ScriptableObject
 public enum BoardNodeType
 {
     Basic,
-    Pool,
-    Vortex,
-    Block,
-    Moving,
+    Drain,
+    Fill,
     Null,
+    Pool,
+    Redirect,
+    Vortex,
 }
 
 public enum BoardNodeAffiliation

@@ -26,7 +26,6 @@ public class LevelBehavior : MonoBehaviour
     [SerializeField]
     private NodeButtonPanelViewController buttonController;
     
-    private BoardNode selectedNode;
     private NodeButtonBehavior downButton;
     private bool playing = false;
 
@@ -189,7 +188,6 @@ public class LevelBehavior : MonoBehaviour
             downButton.Deselect();
             downButton = null;
         }
-        selectedNode = null;
     }
 
     void OnSpinEnd()

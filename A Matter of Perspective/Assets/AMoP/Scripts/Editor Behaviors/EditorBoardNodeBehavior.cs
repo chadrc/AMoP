@@ -10,10 +10,11 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	public static Dictionary<BoardNodeType, Color> TypeColorMap = new Dictionary<BoardNodeType, Color> () 
 	{
 		{BoardNodeType.Basic, new Color(0, 1, 0)},
-		{BoardNodeType.Pool, new Color(0, 0, 1)},
-		{BoardNodeType.Null, new Color(0, 0, 0)},
-		{BoardNodeType.Moving, new Color(0, 1, 1)},
-		{BoardNodeType.Block, new Color(1, 1, 0)},
+        {BoardNodeType.Drain, new Color(1, .5f, 0)},
+        {BoardNodeType.Fill, new Color(1, 1, 0)},
+        {BoardNodeType.Null, new Color(0, 0, 0)},
+        {BoardNodeType.Pool, new Color(0, 0, 1)},
+		{BoardNodeType.Redirect, new Color(0, 1, 1)},
 		{BoardNodeType.Vortex, new Color(.5f, 0, .5f)},
 	};
 

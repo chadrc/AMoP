@@ -7,19 +7,22 @@ public class BoardNodeFactory : ScriptableObject
     private GameObject BasicBoardNodePrefab;
 
     [SerializeField]
+    private GameObject DrainBoardNodePrefab;
+
+    [SerializeField]
+    private GameObject FillBoardNodePrefab;
+
+    [SerializeField]
+    private GameObject NullBoardNodePrefab;
+
+    [SerializeField]
     private GameObject PoolBoardNodePrefab;
 
     [SerializeField]
     private GameObject VortexBoardNodePrefab;
 
     [SerializeField]
-    private GameObject BlockBoardNodePrefab;
-
-    [SerializeField]
-    private GameObject MovingBoardNodePrefab;
-
-    [SerializeField]
-    private GameObject NullBoardNodePrefab;
+    private GameObject RedirectBoardNodePrefab;
 
     public BoardNode CreateNode(BoardNodeData data)
     {
@@ -33,14 +36,14 @@ public class BoardNodeFactory : ScriptableObject
                 node = new BasicBoardNode(data);
                 break;
 
-            case BoardNodeType.Block:
-                prefab = BlockBoardNodePrefab;
-                throw new System.NotImplementedException("Block board node not implemented.");
+            case BoardNodeType.Drain:
+                prefab = DrainBoardNodePrefab;
+                throw new System.NotImplementedException("Drain board node not implemented.");
                 break;
 
-            case BoardNodeType.Moving:
-                prefab = MovingBoardNodePrefab;
-                throw new System.NotImplementedException("Moving board node not implemented.");
+            case BoardNodeType.Fill:
+                prefab = FillBoardNodePrefab;
+                throw new System.NotImplementedException("Fill board node not implemented.");
                 break;
 
             case BoardNodeType.Null:
@@ -51,6 +54,11 @@ public class BoardNodeFactory : ScriptableObject
             case BoardNodeType.Pool:
                 prefab = PoolBoardNodePrefab;
                 node = new PoolBoardNode(data);
+                break;
+
+            case BoardNodeType.Redirect:
+                prefab = RedirectBoardNodePrefab;
+                throw new System.NotImplementedException("Redirect board node not implemented.");
                 break;
 
             case BoardNodeType.Vortex:
