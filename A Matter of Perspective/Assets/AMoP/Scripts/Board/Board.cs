@@ -6,6 +6,7 @@ using System.Collections;
 public class Board : IEnumerable<BoardNode>
 {
     private List<BoardNode> nodes = new List<BoardNode>();
+    private BoardNodeFactory nodeFactory;
 
     public string Name { get; private set; }
     public string Description { get; private set; }
@@ -20,14 +21,19 @@ public class Board : IEnumerable<BoardNode>
 
     public Board(BoardData data, BoardBehavior behavior, BoardNodeFactory nodeFactory)
     {
+        this.nodeFactory = nodeFactory;
         Behavior = behavior;
         foreach (var nodeData in data.Nodes)
         {
-            BoardNode node = nodeFactory.CreateNode(nodeData);
-            node.SetBoard(this);
-            nodes.Add(node);
+            makeNode(nodeData);
         }
         behavior.Init(this);
+    }
+
+    public void ReplaceNode(BoardNode original, BoardNodeData newData)
+    {
+        nodes.Remove(original);
+        makeNode(newData);
     }
 
     public BoardNode GetNode(int x, int y)
@@ -53,6 +59,13 @@ public class Board : IEnumerable<BoardNode>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    private void makeNode(BoardNodeData data)
+    {
+        BoardNode node = nodeFactory.CreateNode(data);
+        node.SetBoard(this);
+        nodes.Add(node);
     }
 }
 

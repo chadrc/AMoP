@@ -83,7 +83,7 @@ public abstract class BoardNode
         }
     }
 
-    private void OnEnergyEnter(EnergyBehavior energyBehavior)
+    protected virtual void OnEnergyEnter(EnergyBehavior energyBehavior)
     {
         if (energyBehavior.EnergyObj.Affiliation == Affiliation.Value || Affiliation.Value == BoardNodeAffiliation.Neutral)
         {
