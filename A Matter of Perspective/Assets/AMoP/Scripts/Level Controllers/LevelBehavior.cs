@@ -31,7 +31,6 @@ public class LevelBehavior : MonoBehaviour
 
     public Board CurrentBoard { get; private set; }
     public EnergyPoolManager EnergyPoolManager { get; private set; }
-    public float GameTime { get; private set; }
     public bool HasNextLevel
     {
         get
@@ -41,6 +40,57 @@ public class LevelBehavior : MonoBehaviour
         }
     }
     public bool HasNextSeries { get { return boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
+
+    // Score metrics
+    public float GameTime { get; private set; }
+    public int BoardTurnCount { get; private set; }
+    public int EnergyTransferCount { get; private set; }
+    public int Score { get { return Mathf.RoundToInt(( gameTimeScore + boardTurnScore + energyTransferScore) * 1000); } }
+
+    private int gameTimeScore
+    {
+        get
+        {
+            if (GameTime == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return Mathf.RoundToInt(1f / GameTime);
+            }
+        }
+    }
+
+    private int boardTurnScore
+    {
+        get
+        {
+            if (BoardTurnCount == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return (1 / BoardTurnCount);
+            }
+        }
+    }
+
+    private int energyTransferScore
+    {
+        get
+        {
+            if (EnergyTransferCount == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return (1 / EnergyTransferCount);
+            }
+        }
+    }
 
     public void StartGame(int seriesIndex, int boardIndex)
     {
@@ -178,6 +228,7 @@ public class LevelBehavior : MonoBehaviour
         var toNode = CurrentBoard.GetNode(up.XIndex, up.YIndex);
 
         fromNode.SendEnergy(toNode);
+        EnergyTransferCount++;
     }
 
     void OnSwipeOccurred(Vector2 dir)
@@ -192,6 +243,6 @@ public class LevelBehavior : MonoBehaviour
 
     void OnSpinEnd()
     {
-        // Hide all node buttons
+        BoardTurnCount++;
     }
 }

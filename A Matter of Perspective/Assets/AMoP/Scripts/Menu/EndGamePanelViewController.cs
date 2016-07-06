@@ -12,6 +12,15 @@ public class EndGamePanelViewController : MonoBehaviour
     private Text gameTimeText;
 
     [SerializeField]
+    private Text boardTurnsText;
+
+    [SerializeField]
+    private Text energyTransfersText;
+
+    [SerializeField]
+    private Text scoreText;
+
+    [SerializeField]
     private GridLayoutGroup buttonGrid;
 
     [SerializeField]
@@ -110,36 +119,66 @@ public class EndGamePanelViewController : MonoBehaviour
             canvasGroup.alpha = (timer / fadeInTime);
             yield return new WaitForEndOfFrame();
         }
-
-        float timeDisplay = 0;
+        
         timer = 0;
         while (timer < timeForGameTimeCountUp)
         {
-            timeDisplay = Mathf.Lerp(0, LevelBehavior.Current.GameTime, (timer / timeForGameTimeCountUp));
-            int seconds = (int)timeDisplay;
-            int min = seconds / 60;
-            seconds %= 60;
+            float frac = (timer / timeForGameTimeCountUp);
+            displayStats(frac);
+            timer += Time.unscaledDeltaTime;
+            yield return new WaitForEndOfFrame();
+        }
 
-            int ms = (int)((timeDisplay - seconds) * 100f);
+        displayStats(1.0f);
 
-            string minStr = min.ToString("00");
-            string secStr = seconds.ToString("00");
-            string msStr = ms.ToString("00");
+        yield return new WaitForSecondsRealtime(.5f);
 
-            string display;
-            if (min > 0)
-            {
-                display = minStr + ":" + secStr + "." + msStr;
-            }
-            else
-            {
-                display = secStr + "." + msStr;
-            }
-
-            gameTimeText.text = display;
+        timer = 0;
+        int score = LevelBehavior.Current.Score;
+        while (timer < timeForGameTimeCountUp)
+        {
+            float frac = (timer / timeForGameTimeCountUp);
+            float scoreDisplay = Mathf.Lerp(0, score, frac);
+            scoreText.text = ((int)scoreDisplay).ToString();
 
             timer += Time.unscaledDeltaTime;
             yield return new WaitForEndOfFrame();
         }
+        scoreText.text = score.ToString();
+    }
+
+    private void displayStats(float t)
+    {
+        // Game Time
+        float timeDisplay = Mathf.Lerp(0, LevelBehavior.Current.GameTime, t);
+        int seconds = (int)timeDisplay;
+        int min = seconds / 60;
+        seconds %= 60;
+
+        int ms = (int)((timeDisplay - seconds) * 100f);
+
+        string minStr = min.ToString("00");
+        string secStr = seconds.ToString("00");
+        string msStr = ms.ToString("00");
+
+        string display;
+        if (min > 0)
+        {
+            display = minStr + ":" + secStr + "." + msStr;
+        }
+        else
+        {
+            display = secStr + "." + msStr;
+        }
+
+        gameTimeText.text = display;
+
+        // Board Turns
+        float btDisplay = Mathf.Lerp(0, LevelBehavior.Current.BoardTurnCount, t);
+        boardTurnsText.text = ((int)btDisplay).ToString();
+
+        // Energy Transfers
+        float etDisplay = Mathf.Lerp(0, LevelBehavior.Current.EnergyTransferCount, t);
+        energyTransfersText.text = ((int)etDisplay).ToString();
     }
 }
