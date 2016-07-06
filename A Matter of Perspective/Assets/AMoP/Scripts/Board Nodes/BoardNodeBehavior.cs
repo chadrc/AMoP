@@ -59,7 +59,10 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     protected abstract void OnNodeEnergyChanged(float energy);
 
     // Use this for initialization
-    protected abstract void Awake();
+    protected virtual void Awake()
+    {
+
+    }
     
     void OnDestroy()
     {
