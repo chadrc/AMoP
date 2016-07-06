@@ -38,7 +38,7 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Drain:
                 prefab = DrainBoardNodePrefab;
-                throw new System.NotImplementedException("Drain board node not implemented.");
+                node = new DrainBoardNode(data);
                 break;
 
             case BoardNodeType.Fill:

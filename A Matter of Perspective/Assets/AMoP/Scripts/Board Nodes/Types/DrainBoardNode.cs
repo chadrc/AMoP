@@ -4,6 +4,8 @@ using System;
 
 public class DrainBoardNode : BoardNode
 {
+    float depletionRate = .5f;
+
     public DrainBoardNode(BoardNodeData data) : base(data)
     {
     }
@@ -12,7 +14,7 @@ public class DrainBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -20,12 +22,18 @@ public class DrainBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
     protected override void Update()
     {
-        throw new NotImplementedException();
+        float energy = Energy;
+        energy -= Time.deltaTime * depletionRate;
+        if (energy < 0)
+        {
+            energy = 0;
+        }
+        Energy.Value = energy;
     }
 }
