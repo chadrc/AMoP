@@ -12,7 +12,7 @@ public class FillBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -20,12 +20,22 @@ public class FillBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return false;
         }
     }
 
     protected override void Update()
     {
-        throw new NotImplementedException();
+
+    }
+
+    protected override void OnEnergyEnter(EnergyBehavior energyBehavior)
+    {
+        base.OnEnergyEnter(energyBehavior);
+        if (Energy == MaxEnergy)
+        {
+            ParentBoard.RemoveNode(this);
+            Behavior.gameObject.SetActive(false);
+        }
     }
 }

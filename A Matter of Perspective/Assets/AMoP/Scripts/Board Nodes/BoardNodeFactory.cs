@@ -43,7 +43,7 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Fill:
                 prefab = FillBoardNodePrefab;
-                throw new System.NotImplementedException("Fill board node not implemented.");
+                node = new FillBoardNode(data);
                 break;
 
             case BoardNodeType.Null:

@@ -36,6 +36,11 @@ public class Board : IEnumerable<BoardNode>
         makeNode(newData);
     }
 
+    public void RemoveNode(BoardNode node)
+    {
+        nodes.Remove(node);
+    }
+
     public BoardNode GetNode(int x, int y)
     {
         return GetNodeRow(x, y).Closest;
