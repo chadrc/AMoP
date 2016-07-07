@@ -7,6 +7,8 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     public SphereCollider EnergyCollider { get; private set; }
     public event System.Action<EnergyBehavior> EnergyEnter;
 
+    protected bool Hidden { get; private set; }
+
     public virtual void AttachToNode(BoardNode node)
     {
         DetachFromNode();
@@ -40,16 +42,19 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     public void HalfFade()
     {
         setAlpha(.5f);
+        Hidden = false;
     }
 
     public void FullFade()
     {
         setAlpha(0);
+        Hidden = true;
     }
 
     public void NoFade()
     {
         setAlpha(1.0f);
+        Hidden = false;
     }
 
     public abstract void SendEnergy(BoardNode to);

@@ -58,7 +58,7 @@ public class BoardNodeFactory : ScriptableObject
 
             case BoardNodeType.Redirect:
                 prefab = RedirectBoardNodePrefab;
-                throw new System.NotImplementedException("Redirect board node not implemented.");
+                node = new RedirectBoardNode(data);
                 break;
 
             case BoardNodeType.Vortex:

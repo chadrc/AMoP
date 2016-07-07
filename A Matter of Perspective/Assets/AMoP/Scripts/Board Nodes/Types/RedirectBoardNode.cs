@@ -12,7 +12,7 @@ public class RedirectBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -20,12 +20,40 @@ public class RedirectBoardNode : BoardNode
     {
         get
         {
-            throw new NotImplementedException();
+            return false;
         }
     }
 
     protected override void Update()
     {
-        throw new NotImplementedException();
+
+    }
+
+    protected override void OnEnergyEnter(EnergyBehavior energyBehavior)
+    {
+        var row = ParentBoard.GetNotNodes((int)(Behavior.transform.position.x+2.5f), (int)(Behavior.transform.position.y+2.5f));
+        BoardNode closest = null;
+        if (row.Count == 1)
+        {
+            closest = row[0];
+        } 
+        else
+        {
+            float closestDist = float.MaxValue;
+            foreach (var n in row)
+            {
+                float dist = Vector3.Distance(Behavior.transform.position, n.Behavior.transform.position);
+                if (closest == null || dist < closestDist)
+                {
+                    closestDist = dist;
+                    closest = n;
+                }
+            }
+        }
+
+        if (closest != null)
+        {
+            DeferEnergyEnterTo(closest, energyBehavior);
+        }
     }
 }

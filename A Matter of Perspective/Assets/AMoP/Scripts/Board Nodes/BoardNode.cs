@@ -132,4 +132,9 @@ public abstract class BoardNode
     }
 
     protected abstract void Update();
+
+    protected static void DeferEnergyEnterTo(BoardNode node, EnergyBehavior energy)
+    {
+        node.OnEnergyEnter(energy);
+    }
 }

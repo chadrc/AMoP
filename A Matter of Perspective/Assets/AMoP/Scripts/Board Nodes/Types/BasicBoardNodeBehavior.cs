@@ -32,6 +32,10 @@ public class BasicBoardNodeBehavior : BoardNodeBehavior
     protected override void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
     {
         renderer.material.color = AMoPUtils.GetColorForAffiliation(affiliation);
+        if (Hidden)
+        {
+            setAlpha(0);
+        }
     }
 
     protected override void setAlpha(float a)
