@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
-
+﻿
 public class NullBoardNode : BoardNode
 {
     public NullBoardNode(BoardNodeData data) : base(data)

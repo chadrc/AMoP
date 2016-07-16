@@ -23,7 +23,7 @@ public abstract class BoardNode
     public abstract bool CanSend { get; }
     public abstract bool CanReceive { get; }
 
-    protected float MaxEnergy = 20.0f;
+    protected float MaxEnergy = GameData.Constants.NodeMaxEnergy;
 
     public BoardNode(BoardNodeData data)
     {

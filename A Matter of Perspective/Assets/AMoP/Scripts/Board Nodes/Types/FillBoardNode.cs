@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
-
+﻿
 public class FillBoardNode : BoardNode
 {
     public FillBoardNode(BoardNodeData data) : base(data)
@@ -32,7 +29,7 @@ public class FillBoardNode : BoardNode
     protected override void OnEnergyEnter(EnergyBehavior energyBehavior)
     {
         base.OnEnergyEnter(energyBehavior);
-        if (Energy == MaxEnergy)
+        if (Energy == GameData.Constants.FillNodeFillRequirement)
         {
             ParentBoard.RemoveNode(this);
             Behavior.gameObject.SetActive(false);

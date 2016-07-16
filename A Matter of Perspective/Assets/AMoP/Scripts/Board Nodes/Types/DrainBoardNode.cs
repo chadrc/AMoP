@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 
 public class DrainBoardNode : BoardNode
 {
-    float depletionRate = .5f;
+    float depletionRate = GameData.Constants.DrainNodeDepletionRate;
 
     public DrainBoardNode(BoardNodeData data) : base(data)
     {
