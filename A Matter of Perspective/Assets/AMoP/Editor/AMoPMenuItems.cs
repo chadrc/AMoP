@@ -42,6 +42,12 @@ public class AMoPMenuItem: MonoBehaviour {
         return list;
     }
 
+    [MenuItem("AMoP/Create Game Constants")]
+    public static GameConstants CreateGameConstants()
+    {
+        return CreateDataSO<GameConstants>("GameConstants.asset");
+    }
+
     private static T CreateDataSO<T>(string path) where T : ScriptableObject
     {
         return CreateSO<T>(AssetDatabase.GenerateUniqueAssetPath(BaseDataPath + path));
