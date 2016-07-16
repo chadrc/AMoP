@@ -47,17 +47,17 @@ public class LevelBehavior : MonoBehaviour
     public int EnergyTransferCount { get; private set; }
     public int Score { get { return Mathf.RoundToInt(( gameTimeScore + boardTurnScore + energyTransferScore) * 1000); } }
 
-    private int gameTimeScore
+    private float gameTimeScore
     {
         get
         {
             if (GameTime == 0)
             {
-                return 1;
+                return 0;
             }
             else
             {
-                return Mathf.RoundToInt(1f / GameTime);
+                return 1f / GameTime;
             }
         }
     }
@@ -68,7 +68,7 @@ public class LevelBehavior : MonoBehaviour
         {
             if (BoardTurnCount == 0)
             {
-                return 1;
+                return 0;
             }
             else
             {
@@ -83,7 +83,7 @@ public class LevelBehavior : MonoBehaviour
         {
             if (EnergyTransferCount == 0)
             {
-                return 1;
+                return 0;
             }
             else
             {
@@ -101,6 +101,9 @@ public class LevelBehavior : MonoBehaviour
 
     public void StartGame()
     {
+        GameTime = 0;
+        BoardTurnCount = 0;
+        EnergyTransferCount = 0;
         Time.timeScale = 1.0f;
         EnergyPoolManager.HideAllEnergy();
         DestroyBoard();
