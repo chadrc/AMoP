@@ -8,7 +8,7 @@ public class MenuViewController : MonoBehaviour
 
     public void Show()
     {
-        gameObject.SetActive(true);
+        canvasGroup.Show();
     }
 
     private void Awake()
@@ -26,7 +26,7 @@ public class MenuViewController : MonoBehaviour
     public void StartButtonPressed()
     {
         LevelBehavior.Current.StartGame(0, 0);
-        canvasGroup.gameObject.SetActive(false);
+        canvasGroup.Hide();
     }
 
     private void OnGameEnd()

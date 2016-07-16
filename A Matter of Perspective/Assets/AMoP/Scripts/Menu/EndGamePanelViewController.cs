@@ -38,9 +38,7 @@ public class EndGamePanelViewController : MonoBehaviour
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         LevelBehavior.GameEnd += OnGameEnd;
         canvasGroup = GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        canvasGroup.Hide();
     }
 
     void OnDestroy()
@@ -51,18 +49,18 @@ public class EndGamePanelViewController : MonoBehaviour
     public void MenuButtonPress()
     {
         menu.Show();
-        Hide();
+        canvasGroup.Hide();
     }
 
     public void ReplayButtonPress()
     {
-        Hide();
+        canvasGroup.Hide();
         LevelBehavior.Current.StartGame();
     }
 
     public void NextButtonPress()
     {
-        Hide();
+        canvasGroup.Hide();
         if (LevelBehavior.Current.AdvanceToNextLevel())
         {
             LevelBehavior.Current.StartGame();
@@ -73,13 +71,6 @@ public class EndGamePanelViewController : MonoBehaviour
         }
     }
 
-    private void Hide()
-    {
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-    }
-
     private void onScreenChanged(int width, int height)
     {
         buttonGrid.constraint = width >= height ? GridLayoutGroup.Constraint.FixedRowCount : GridLayoutGroup.Constraint.FixedColumnCount;
@@ -87,9 +78,7 @@ public class EndGamePanelViewController : MonoBehaviour
 
     private void OnGameEnd()
     {
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        canvasGroup.Hide();
         if (!LevelBehavior.Current.HasNextLevel && !LevelBehavior.Current.HasNextSeries)
         {
             nextLevelButton.gameObject.SetActive(false);
@@ -116,7 +105,7 @@ public class EndGamePanelViewController : MonoBehaviour
         while (timer < fadeInTime)
         {
             timer += Time.unscaledDeltaTime;
-            canvasGroup.alpha = (timer / fadeInTime);
+            canvasGroup.SetAlpha(timer / fadeInTime);
             yield return new WaitForEndOfFrame();
         }
         
