@@ -30,12 +30,10 @@ public class BoardEditor : EditorWindow
         Stats,
         Actions
     }
-
-    // Add menu named "My Window" to the Window menu
+    
     [MenuItem("AMoP/Board Editor")]
     static void Init()
     {
-        // Get existing open window or if none, make a new one:
         var window = (BoardEditor)EditorWindow.GetWindow(typeof(BoardEditor));
 		window.name = "Board Editor";
         window.Show();
