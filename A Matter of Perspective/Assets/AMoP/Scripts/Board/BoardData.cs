@@ -1,61 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public enum BoardCompletionLevel : int
-{
-    Completed = -1,
-    Bronze = 0,
-    Silver = 1,
-    Gold = 2,
-}
-
-[System.Serializable]
-public class BoardScores
-{
-    [SerializeField]
-    private int[] scores = new int[3];
-
-    public int this[BoardCompletionLevel level]
-    {
-        get
-        {
-            if (level == BoardCompletionLevel.Completed)
-            {
-                Debug.LogError("Cannot index BoardScores with BoardCompletionLevel.Completed.");
-                return -1;
-            }
-            return scores[(int)level];
-        }
-    }
-
-    public int HighestScore
-    {
-        get
-        {
-            return scores[2];
-        }
-    }
-
-    public BoardCompletionLevel GetCompletionLevel(int score)
-    {
-        int highest = -1;
-        int current = 0;
-        foreach (var s in scores)
-        {
-            if (score >= s)
-            {
-                highest = current;
-                current++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return (BoardCompletionLevel)highest;
-    }
-}
-
 public class BoardData : ScriptableObject
 {
     [SerializeField]

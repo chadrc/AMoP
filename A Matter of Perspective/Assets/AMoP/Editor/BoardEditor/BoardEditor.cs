@@ -192,12 +192,10 @@ public class BoardEditor : EditorWindow
     private void StatsTabState()
     {
         EditorGUILayout.LabelField("Scores");
-        var levels = new List<BoardCompletionLevel>((BoardCompletionLevel[])Enum.GetValues(typeof(BoardCompletionLevel)));
-        levels.Remove(BoardCompletionLevel.Completed);
 
-        foreach (var level in levels)
+        foreach (var pair in boardData.Scores)
         {
-            EditorGUILayout.IntField(level.ToString(), boardData.Scores[level]);
+            EditorGUILayout.IntField(pair.Key.ToString(), pair.Value);
         }
     }
 
