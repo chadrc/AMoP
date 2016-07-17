@@ -35,6 +35,16 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerE
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
 
+        FindNode();
+    }
+
+    public void FindNode()
+    {
+        if (node != null)
+        {
+            node.Energy.Changed -= onNodeEnergyChanged;
+        }
+
         node = LevelBehavior.Current.CurrentBoard.GetOffsetNode(XIndex, YIndex);
         if (node != null)
         {

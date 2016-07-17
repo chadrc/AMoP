@@ -32,6 +32,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     void Awake ()
     {
         LevelBehavior.GameStart += onGameStart;
+        LevelBehavior.GameEnd += onGameEnd;
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         StartCoroutine(initialize());
     }
@@ -49,12 +50,26 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private void onGameStart()
     {
+        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd += onBoardSpin;
         reset();
+    }
+
+    private void onGameEnd()
+    {
+        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd -= onBoardSpin;
     }
 
     private void onScreenChanged(int width, int height)
     {
         reset();
+    }
+
+    private void onBoardSpin()
+    {
+        foreach(var button in nodeButtons)
+        {
+            button.FindNode();
+        }
     }
 
     private IEnumerator initialize()
