@@ -122,6 +122,7 @@ public class LevelBehavior : MonoBehaviour
             return;
         }
         CurrentBoard = new Board(boardData, boardBehavior, boardNodeFactory);
+        CurrentBoard.Behavior.Init(CurrentBoard);
         CurrentBoard.Behavior.SpinEnd += OnSpinEnd;
         foreach (var node in CurrentBoard)
         {

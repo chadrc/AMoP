@@ -12,17 +12,18 @@ public abstract class BoardNodeBehavior : MonoBehaviour
     public virtual void AttachToNode(BoardNode node)
     {
         DetachFromNode();
-
-        // 2.5 is 3 (half of board size 6) minus .5 (offset to nodes default position at the origin)
-        // subtract it from all nodes to center board on screen
+        
         EnergyCollider = GetComponent<SphereCollider>();
-        Vector3 pos = node.Position - new Vector3(2.5f, 2.5f, 2.5f);
-        transform.position = pos;
 
         Node = node;
+
+        Vector3 pos = node.Position - Node.ParentBoard.OffsetVector;
+        transform.position = pos;
+
         node.Affiliation.Changed += OnNodeAffiliationChanged;
         node.Type.Changed += OnNodeTypeChanged;
         node.Energy.Changed += OnNodeEnergyChanged;
+
         OnNodeEnergyChanged(node.Energy);
         OnNodeAffiliationChanged(node.Affiliation);
     }

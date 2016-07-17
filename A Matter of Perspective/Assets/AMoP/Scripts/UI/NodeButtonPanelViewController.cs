@@ -31,11 +31,12 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     // Use this for initialization
     void Awake ()
     {
+        LevelBehavior.GameStart += onGameStart;
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         StartCoroutine(initialize());
     }
 
-    private void onScreenChanged(int width, int height)
+    private void reset()
     {
         foreach (var button in nodeButtons)
         {
@@ -45,29 +46,43 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         StartCoroutine(initialize());
     }
 
+    private void onGameStart()
+    {
+        reset();
+    }
+
+    private void onScreenChanged(int width, int height)
+    {
+        reset();
+    }
+
     private IEnumerator initialize()
     {
         // Need to wait for camera to update fully before recreating buttons
         yield return new WaitForEndOfFrame();
 
-        float ratio = Screen.width / (float)Screen.height;
+        if (LevelBehavior.Current.CurrentBoard != null)
+        {
+            float ratio = Screen.width / (float)Screen.height;
 
-        if (ratio >= 1.0f)
-        {
-            // Landscape
-            Camera.main.orthographicSize = 4.0f;
-        }
-        else
-        {
-            // Portrait
-            Camera.main.orthographicSize = 4.0f / ratio;
-        }
-
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 6; j++)
+            if (ratio >= 1.0f)
             {
-                createButton(i, j);
+                // Landscape
+                Camera.main.orthographicSize = 4.0f;
+            }
+            else
+            {
+                // Portrait
+                Camera.main.orthographicSize = 4.0f / ratio;
+            }
+
+            float boardSize = LevelBehavior.Current.CurrentBoard.BoardSize;
+            for (int i = 0; i < boardSize; i++)
+            {
+                for (int j = 0; j < boardSize; j++)
+                {
+                    createButton(i, j);
+                }
             }
         }
     }
@@ -78,7 +93,8 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         var behavior = btnObj.GetComponent<NodeButtonBehavior>();
         btnObj.transform.SetParent(transform);
         btnObj.transform.localScale = Vector3.one;
-        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - 2.5f, y - 2.5f, 0));
+        float offset = LevelBehavior.Current.CurrentBoard.OffsetValue;
+        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - offset, y - offset, 0));
         (btnObj.transform as RectTransform).anchoredPosition = pos;
         behavior.Init(this, x, y);
         nodeButtons.Add(behavior);

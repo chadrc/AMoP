@@ -4,7 +4,7 @@ public class VortexBoardNode : BoardNode
 {
     private float depletionRate = GameData.Constants.VortexNodeDepletionRate;
 
-    public VortexBoardNode(BoardNodeData data) : base(data)
+    public VortexBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
     }
 

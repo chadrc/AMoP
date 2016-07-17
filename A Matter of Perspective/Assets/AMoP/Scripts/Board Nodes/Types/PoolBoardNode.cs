@@ -4,7 +4,7 @@ public class PoolBoardNode : BoardNode
 {
     private float regenRate = GameData.Constants.PoolNodeGenerationRate;
 
-    public PoolBoardNode(BoardNodeData data) : base(data)
+    public PoolBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
 
     }

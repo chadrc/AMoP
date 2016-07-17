@@ -25,12 +25,13 @@ public abstract class BoardNode
 
     protected float MaxEnergy = GameData.Constants.NodeMaxEnergy;
 
-    public BoardNode(BoardNodeData data)
+    public BoardNode(BoardNodeData data, Board parent)
     {
         Position = data.Position;
         Energy = data.StartingEnergy;
         Type = data.Type;
         Affiliation = data.Affiliation;
+        ParentBoard = parent;
     }
 
     ~BoardNode()
@@ -59,6 +60,7 @@ public abstract class BoardNode
         DetachFromBehavior();
 
         Behavior = behavior;
+        Behavior.transform.SetParent(ParentBoard.Behavior.transform);
         behavior.EnergyEnter += OnEnergyEnter;
         updateRoutine = behavior.StartCoroutine(UpdateRoutine());
     }
@@ -89,7 +91,7 @@ public abstract class BoardNode
         {
             Affiliation.Value = energyBehavior.EnergyObj.Affiliation;
             float newValue = Energy + 1;
-            if (newValue <= 20f)
+            if (newValue <= GameData.Constants.NodeMaxEnergy)
             {
                 Energy.Value = newValue;
             }

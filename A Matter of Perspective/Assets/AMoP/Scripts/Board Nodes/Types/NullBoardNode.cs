@@ -1,7 +1,7 @@
 ﻿
 public class NullBoardNode : BoardNode
 {
-    public NullBoardNode(BoardNodeData data) : base(data)
+    public NullBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
     }
 

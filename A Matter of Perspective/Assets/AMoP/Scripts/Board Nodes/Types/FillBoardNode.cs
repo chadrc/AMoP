@@ -1,7 +1,7 @@
 ﻿
 public class FillBoardNode : BoardNode
 {
-    public FillBoardNode(BoardNodeData data) : base(data)
+    public FillBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
     }
 

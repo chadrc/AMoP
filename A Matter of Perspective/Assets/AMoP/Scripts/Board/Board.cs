@@ -18,16 +18,31 @@ public class Board : IEnumerable<BoardNode>
         }
     }
     public BoardBehavior Behavior { get; private set; }
+    public int BoardSize { get; private set; }
+    public float OffsetValue
+    {
+        get
+        {
+            return (BoardSize / 2f) - 0.5f;
+        }
+    }
+    public Vector3 OffsetVector
+    {
+        get
+        {
+            return new Vector3(OffsetValue, OffsetValue, OffsetValue);
+        }
+    }
 
     public Board(BoardData data, BoardBehavior behavior, BoardNodeFactory nodeFactory)
     {
+        BoardSize = data.BoardSize;
         this.nodeFactory = nodeFactory;
         Behavior = behavior;
         foreach (var nodeData in data.Nodes)
         {
             makeNode(nodeData);
         }
-        behavior.Init(this);
     }
 
     public void ReplaceNode(BoardNode original, BoardNodeData newData)
@@ -68,8 +83,7 @@ public class Board : IEnumerable<BoardNode>
 
     private void makeNode(BoardNodeData data)
     {
-        BoardNode node = nodeFactory.CreateNode(data);
-        node.SetBoard(this);
+        BoardNode node = nodeFactory.CreateNode(data, this);
         nodes.Add(node);
     }
 }

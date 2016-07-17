@@ -4,7 +4,7 @@ public class DrainBoardNode : BoardNode
 {
     float depletionRate = GameData.Constants.DrainNodeDepletionRate;
 
-    public DrainBoardNode(BoardNodeData data) : base(data)
+    public DrainBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
     }
 

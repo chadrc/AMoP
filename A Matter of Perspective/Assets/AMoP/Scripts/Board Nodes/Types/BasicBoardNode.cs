@@ -2,7 +2,7 @@
 public class BasicBoardNode : BoardNode
 {
 
-    public BasicBoardNode(BoardNodeData data) : base(data)
+    public BasicBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
 
     }

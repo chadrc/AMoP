@@ -24,7 +24,7 @@ public class BoardNodeFactory : ScriptableObject
     [SerializeField]
     private GameObject RedirectBoardNodePrefab;
 
-    public BoardNode CreateNode(BoardNodeData data)
+    public BoardNode CreateNode(BoardNodeData data, Board parent)
     {
         GameObject prefab = null;
         BoardNode node = null;
@@ -33,37 +33,37 @@ public class BoardNodeFactory : ScriptableObject
         {
             case BoardNodeType.Basic:
                 prefab = BasicBoardNodePrefab;
-                node = new BasicBoardNode(data);
+                node = new BasicBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Drain:
                 prefab = DrainBoardNodePrefab;
-                node = new DrainBoardNode(data);
+                node = new DrainBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Fill:
                 prefab = FillBoardNodePrefab;
-                node = new FillBoardNode(data);
+                node = new FillBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Null:
                 prefab = NullBoardNodePrefab;
-                node = new NullBoardNode(data);
+                node = new NullBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Pool:
                 prefab = PoolBoardNodePrefab;
-                node = new PoolBoardNode(data);
+                node = new PoolBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Redirect:
                 prefab = RedirectBoardNodePrefab;
-                node = new RedirectBoardNode(data);
+                node = new RedirectBoardNode(data, parent);
                 break;
 
             case BoardNodeType.Vortex:
                 prefab = VortexBoardNodePrefab;
-                node = new VortexBoardNode(data);
+                node = new VortexBoardNode(data, parent);
                 break;
         }
         #pragma warning restore 0162

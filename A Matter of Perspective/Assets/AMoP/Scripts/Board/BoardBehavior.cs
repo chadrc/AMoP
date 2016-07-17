@@ -32,10 +32,9 @@ public class BoardBehavior : MonoBehaviour {
 
     private void HideShowNodes()
     {
-
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < BoardObject.BoardSize; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < BoardObject.BoardSize; j++)
             {
                 var boardRow = BoardObject.GetNodeRow(i, j);
                 if (boardRow.Closest != null)

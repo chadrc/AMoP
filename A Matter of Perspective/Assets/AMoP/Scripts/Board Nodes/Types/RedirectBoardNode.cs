@@ -2,7 +2,7 @@
 
 public class RedirectBoardNode : BoardNode
 {
-    public RedirectBoardNode(BoardNodeData data) : base(data)
+    public RedirectBoardNode(BoardNodeData data, Board parent) : base(data, parent)
     {
     }
 

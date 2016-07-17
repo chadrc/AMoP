@@ -89,15 +89,15 @@ public static class AMoPUtils
 
 	private static BehaviorRow GetBehaviorRow(List<MonoBehaviour> behaviors, int x, int y)
 	{
-		float posX = x - 2.5f;
-		float posY = y - 2.5f;
+		float posX = x - LevelBehavior.Current.CurrentBoard.OffsetValue;
+		float posY = y - LevelBehavior.Current.CurrentBoard.OffsetValue;
 
 		var xyNodes = new List<MonoBehaviour>();
 		foreach (var node in behaviors)
 		{
 			// Check for position in 1 unit range to account for float errors
-			if (node.transform.position.x > posX - .5f && node.transform.position.x < posX + .5f &&
-				node.transform.position.y > posY - .5f && node.transform.position.y < posY + .5f)
+			if (node.transform.position.x > posX - .25f && node.transform.position.x < posX + .25f &&
+				node.transform.position.y > posY - .25f && node.transform.position.y < posY + .25f)
 			{
 				xyNodes.Add(node);
 			}
@@ -111,9 +111,9 @@ public static class AMoPUtils
 			{
 				matchNode = node;
 			}
-		}
+        }
 
-		if (matchNode != null)
+        if (matchNode != null)
 		{
 			xyNodes.Remove(matchNode);
 		}
