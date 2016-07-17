@@ -56,7 +56,7 @@ public class BoardBehavior : MonoBehaviour {
     IEnumerator boardSpin(Vector2 dir)
     {
         canSpin = false;
-        float spinTime = .25f;
+        float spinTime = GameData.Constants.BoardSpinTime;
         float t = 0;
         Quaternion startRot = transform.rotation;
         transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);

@@ -112,12 +112,12 @@ public abstract class BoardNode
     {
         int toSend = Mathf.RoundToInt(Energy.Value);
         var range = new Range(toSend);
-        #pragma warning disable 0168
+        #pragma warning disable 0168 // Unused variable warning
         foreach (var i in range)
         {
             Behavior.SendEnergy(to);
             Energy.Value--;
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(GameData.Constants.NodeSendEnergyInterval);
         }
         #pragma warning restore 0168
     }

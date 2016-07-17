@@ -18,7 +18,15 @@ public class GameConstants : ScriptableObject
     [SerializeField]
     private float scoreMultiplier;
 
+    [Header("Board Values")]
+
+    [SerializeField]
+    private float boardSpinTime;
+
     [Header("Node Values")]
+
+    [SerializeField]
+    private float nodeSendEnergyInterval;
 
     [SerializeField]
     private float nodeMaxEnergy;
@@ -58,6 +66,9 @@ public class GameConstants : ScriptableObject
     public float EnergyTransfersWeight { get { return energyTransfersWeight; } }
     public float ScoreMultiplier { get { return scoreMultiplier; } }
 
+    public float BoardSpinTime { get { return boardSpinTime; } }
+
+    public float NodeSendEnergyInterval { get { return nodeSendEnergyInterval; } }
     public float NodeMaxEnergy { get { return nodeMaxEnergy; } }
     public float DrainNodeDepletionRate { get { return drainNodeDepletionRate; } }
     public float FillNodeFillRequirement { get { return fillNodeFillRequirement; } }
