@@ -38,7 +38,6 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private void reset()
     {
-        Debug.Log("Resetting");
         foreach (var button in nodeButtons)
         {
             button.Uninit();
@@ -70,12 +69,12 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             if (ratio >= 1.0f)
             {
                 // Landscape
-                Camera.main.orthographicSize = 4.0f;
+                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize);
             }
             else
             {
                 // Portrait
-                Camera.main.orthographicSize = 4.0f / ratio;
+                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize) / ratio;
             }
 
             float boardSize = LevelBehavior.Current.CurrentBoard.BoardSize;

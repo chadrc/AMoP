@@ -3,6 +3,29 @@ using System.Collections.Generic;
 
 public static class AMoPUtils
 {
+    public static float GetOrthoSizeForBoardSize(int boardSize)
+    {
+        float size = 0;
+        switch (boardSize)
+        {
+            case 3:
+                size = GameData.Constants.OrthoSizeFor3;
+                break;
+            case 4:
+                size = GameData.Constants.OrthoSizeFor4;
+                break;
+            case 5:
+                size = GameData.Constants.OrthoSizeFor5;
+                break;
+            case 6:
+                size = GameData.Constants.OrthoSizeFor6;
+                break;
+            default:
+                throw new System.ArgumentException("Invalid board size (" + boardSize + "). Value must be one of [3, 4, 5, 6].");
+        }
+        return size;
+    }
+
     public static Color GetColorForAffiliation(BoardNodeAffiliation affiliation)
     {
         Color newClr;

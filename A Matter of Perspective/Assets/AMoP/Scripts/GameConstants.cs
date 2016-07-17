@@ -18,6 +18,20 @@ public class GameConstants : ScriptableObject
     [SerializeField]
     private float scoreMultiplier;
 
+    [Header("Orthographic Sizes")]
+
+    [SerializeField]
+    private float orthoSizeForSize3;
+
+    [SerializeField]
+    private float orthoSizeForSize4;
+
+    [SerializeField]
+    private float orthoSizeForSize5;
+
+    [SerializeField]
+    private float orthoSizeForSize6;
+
     [Header("Board Values")]
 
     [SerializeField]
@@ -65,6 +79,11 @@ public class GameConstants : ScriptableObject
     public float BoardTurnsWeight { get { return boardTurnsWeight; } }
     public float EnergyTransfersWeight { get { return energyTransfersWeight; } }
     public float ScoreMultiplier { get { return scoreMultiplier; } }
+
+    public float OrthoSizeFor3 { get { return orthoSizeForSize3; } }
+    public float OrthoSizeFor4 { get { return orthoSizeForSize4; } }
+    public float OrthoSizeFor5 { get { return orthoSizeForSize5; } }
+    public float OrthoSizeFor6 { get { return orthoSizeForSize6; } }
 
     public float BoardSpinTime { get { return boardSpinTime; } }
 
