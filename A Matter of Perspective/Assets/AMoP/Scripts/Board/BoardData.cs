@@ -19,6 +19,11 @@ public class BoardScores
     {
         get
         {
+            if (level == BoardCompletionLevel.Completed)
+            {
+                Debug.LogError("Cannot index BoardScores with BoardCompletionLevel.Completed.");
+                return -1;
+            }
             return scores[(int)level];
         }
     }
