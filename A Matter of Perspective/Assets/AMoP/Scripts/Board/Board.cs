@@ -56,19 +56,34 @@ public class Board : IEnumerable<BoardNode>
         nodes.Remove(node);
     }
 
-    public BoardNode GetNode(int x, int y)
+    public BoardNode GetNode(float x, float y)
     {
         return GetNodeRow(x, y).Closest;
     }
 
-    public List<BoardNode> GetNotNodes(int x, int y)
+    public BoardNode GetOffsetNode(float x, float y)
+    {
+        return GetOffsetNodeRow(x, y).Closest;
+    }
+
+    public List<BoardNode> GetNotNodes(float x, float y)
     {
         return GetNodeRow(x, y).Hidden;
     }
 
-    public NodeRow GetNodeRow(int x, int y)
+    public List<BoardNode> GetOffsetNotNode(float x, float y)
     {
-		return AMoPUtils.GetNodeRow (Nodes, (int)(x - OffsetValue), (int)(y - OffsetValue));
+        return GetOffsetNodeRow(x, y).Hidden;
+    }
+
+    public NodeRow GetNodeRow(float x, float y)
+    {
+		return AMoPUtils.GetNodeRow (Nodes, x, y);
+    }
+
+    public NodeRow GetOffsetNodeRow(float x, float y)
+    {
+        return AMoPUtils.GetNodeRow(Nodes, x - OffsetValue, y - OffsetValue);
     }
 
     public IEnumerator<BoardNode> GetEnumerator()

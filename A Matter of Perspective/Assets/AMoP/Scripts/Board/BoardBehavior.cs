@@ -36,7 +36,7 @@ public class BoardBehavior : MonoBehaviour {
         {
             for (int j = 0; j < BoardObject.BoardSize; j++)
             {
-                var boardRow = BoardObject.GetNodeRow(i, j);
+                var boardRow = BoardObject.GetOffsetNodeRow(i, j);
                 if (boardRow.Closest != null)
                 {
                     boardRow.Closest.Behavior.NoFade();

@@ -147,10 +147,11 @@ public class EndGamePanelViewController : MonoBehaviour
         // Game Time
         float timeDisplay = Mathf.Lerp(0, LevelBehavior.Current.GameTime, t);
         int seconds = (int)timeDisplay;
+        float timeDec = timeDisplay - seconds;
         int min = seconds / 60;
         seconds %= 60;
 
-        int ms = (int)((timeDisplay - seconds) * 100f);
+        int ms = (int)(timeDec * 100f);
 
         string minStr = min.ToString("00");
         string secStr = seconds.ToString("00");

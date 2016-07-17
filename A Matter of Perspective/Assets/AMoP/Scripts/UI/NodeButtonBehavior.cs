@@ -16,10 +16,11 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     private CanvasGroup canvasGroup;
 
+    private BoardNode node;
+
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        LevelBehavior.GameStart += onGameStart;
     }
 
     public void Init(NodeButtonPanelViewController controller, int xIndex, int yIndex)
@@ -33,15 +34,20 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerE
         float pixelHeight = Screen.height * heightRatio;
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
-    }
 
-    private void onGameStart()
-    {
-        var node = LevelBehavior.Current.CurrentBoard.GetNode(XIndex, YIndex);
+        node = LevelBehavior.Current.CurrentBoard.GetOffsetNode(XIndex, YIndex);
         if (node != null)
         {
             node.Energy.Changed += onNodeEnergyChanged;
             energyText.text = ((int)node.Energy.Value).ToString();
+        }
+    }
+
+    public void Uninit()
+    {
+        if (node != null)
+        {
+            node.Energy.Changed -= onNodeEnergyChanged;
         }
     }
 

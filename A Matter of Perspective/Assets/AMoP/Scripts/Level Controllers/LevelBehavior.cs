@@ -228,8 +228,8 @@ public class LevelBehavior : MonoBehaviour
 
     void OnNodeSwipeOccurred(NodeButtonBehavior down, NodeButtonBehavior up, Vector2 dir)
     {
-        var fromNode = CurrentBoard.GetNode(down.XIndex, down.YIndex);
-        var toNode = CurrentBoard.GetNode(up.XIndex, up.YIndex);
+        var fromNode = CurrentBoard.GetOffsetNode(down.XIndex, down.YIndex);
+        var toNode = CurrentBoard.GetOffsetNode(up.XIndex, up.YIndex);
 
         fromNode.SendEnergy(toNode);
         EnergyTransferCount++;

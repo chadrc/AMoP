@@ -38,8 +38,10 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
     private void reset()
     {
+        Debug.Log("Resetting");
         foreach (var button in nodeButtons)
         {
+            button.Uninit();
             GameObject.Destroy(button.gameObject);
         }
         nodeButtons.Clear();
@@ -103,7 +105,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
     public void ButtonEnter(NodeButtonBehavior button, PointerEventData data)
     {
         lastEnter = button;
-        var node = board.GetNode(button.XIndex, button.YIndex);
+        var node = board.GetOffsetNode(button.XIndex, button.YIndex);
         if (node != null && button != downButton)
         {
             if (downButton != null && node.CanReceive)
@@ -138,7 +140,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
             return;
         }
 
-        var node = board.GetNode(lastEnter.XIndex, lastEnter.YIndex);
+        var node = board.GetOffsetNode(lastEnter.XIndex, lastEnter.YIndex);
         if (node != null && node.Affiliation == BoardNodeAffiliation.Player && node.CanSend)
         {
             downButton = lastEnter;
@@ -156,7 +158,7 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
 
                 if (downButton != lastEnter)
                 {
-                    var node = board.GetNode(lastEnter.XIndex, lastEnter.YIndex);
+                    var node = board.GetOffsetNode(lastEnter.XIndex, lastEnter.YIndex);
                     if (node != null)
                     {
                         if (NodeSwipeOccurred != null)

@@ -298,11 +298,11 @@ public class BoardEditor : EditorWindow
 
 	private void showAllNodes()
 	{
-		for (int x = 0; x < 6; x++)
+		for (int x = 0; x < boardData.BoardSize; x++)
 		{
-			for (int y = 0; y < 6; y++)
+			for (int y = 0; y < boardData.BoardSize; y++)
 			{
-				var row = AMoPUtils.GetEditNodeRow (editNodes, (int)(x-boardData.OffsetValue), (int)(y-boardData.OffsetValue));
+                var row = AMoPUtils.GetEditNodeRow(editNodes, x - boardData.OffsetValue, y - boardData.OffsetValue);
 				row.Closest.Show ();
 				foreach (var h in row.Hidden)
 				{
@@ -319,11 +319,11 @@ public class BoardEditor : EditorWindow
 			return;
 		}
 
-		for (int x = 0; x < 6; x++)
+		for (int x = 0; x < boardData.BoardSize; x++)
 		{
-			for (int y = 0; y < 6; y++)
+			for (int y = 0; y < boardData.BoardSize; y++)
 			{
-				var row = AMoPUtils.GetEditNodeRow (editNodes, (int)(x - boardData.OffsetValue), (int)(y - boardData.OffsetValue));
+                var row = AMoPUtils.GetEditNodeRow(editNodes, x - boardData.OffsetValue, y - boardData.OffsetValue);
 				if (row.Closest != null)
 				{
 					row.Closest.Show ();

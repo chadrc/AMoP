@@ -29,7 +29,7 @@ public class RedirectBoardNode : BoardNode
 
     protected override void OnEnergyEnter(EnergyBehavior energyBehavior)
     {
-        var row = ParentBoard.GetNotNodes((int)(Behavior.transform.position.x+2.5f), (int)(Behavior.transform.position.y+2.5f));
+        var row = ParentBoard.GetNotNodes(Behavior.transform.position.x, Behavior.transform.position.y);
         BoardNode closest = null;
         if (row.Count == 1)
         {

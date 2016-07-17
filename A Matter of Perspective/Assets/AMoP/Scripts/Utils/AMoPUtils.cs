@@ -27,7 +27,7 @@ public static class AMoPUtils
         return newClr;
     }
 
-	public static NodeRow GetNodeRow(List<BoardNode> nodes, int x, int y)
+	public static NodeRow GetNodeRow(List<BoardNode> nodes, float x, float y)
 	{
 		List<MonoBehaviour> behaviorList = new List<MonoBehaviour> ();
 		foreach (var n in nodes)
@@ -57,7 +57,7 @@ public static class AMoPUtils
 		return new NodeRow (closest, hidden);
 	}
 
-	public static EditNodeRow GetEditNodeRow(List<EditorBoardNodeBehavior> editNodes, int x, int y)
+	public static EditNodeRow GetEditNodeRow(List<EditorBoardNodeBehavior> editNodes, float x, float y)
 	{
 		List<MonoBehaviour> behaviorList = new List<MonoBehaviour> ();
 		foreach (var n in editNodes)
@@ -87,17 +87,14 @@ public static class AMoPUtils
 		return new EditNodeRow (closest, hidden);
 	}
 
-	private static BehaviorRow GetBehaviorRow(List<MonoBehaviour> behaviors, int x, int y)
+	private static BehaviorRow GetBehaviorRow(List<MonoBehaviour> behaviors, float x, float y)
 	{
-		float posX = x;
-		float posY = y;
-
 		var xyNodes = new List<MonoBehaviour>();
 		foreach (var node in behaviors)
 		{
 			// Check for position in 1 unit range to account for float errors
-			if (node.transform.position.x > posX - .25f && node.transform.position.x < posX + .25f &&
-				node.transform.position.y > posY - .25f && node.transform.position.y < posY + .25f)
+			if (node.transform.position.x > x - .25f && node.transform.position.x < x + .25f &&
+				node.transform.position.y > y - .25f && node.transform.position.y < y + .25f)
 			{
 				xyNodes.Add(node);
 			}
