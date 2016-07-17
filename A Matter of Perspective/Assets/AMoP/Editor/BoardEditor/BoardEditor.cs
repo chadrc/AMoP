@@ -5,8 +5,8 @@ using System;
 
 public class BoardEditor : EditorWindow
 {
-	private const float boardRotateControlWidth = 100f;
-	private const float boardRotateControlHeight = 100f;
+	private const float boardRotateControlWidth = 112f;
+	private const float boardRotateControlHeight = 112f;
 
 	private const float legendItemWidth = 80f;
 	private const float legendItemHeight = 20f;
@@ -193,7 +193,14 @@ public class BoardEditor : EditorWindow
 
     private void StatsTabState()
     {
+        EditorGUILayout.LabelField("Scores");
+        var levels = new List<BoardCompletionLevel>((BoardCompletionLevel[])Enum.GetValues(typeof(BoardCompletionLevel)));
+        levels.Remove(BoardCompletionLevel.Completed);
 
+        foreach (var level in levels)
+        {
+            EditorGUILayout.IntField(level.ToString(), boardData.Scores[level]);
+        }
     }
 
     private void ActionsTabState()
@@ -426,7 +433,7 @@ public class BoardEditor : EditorWindow
 
 		EditorGUILayout.BeginHorizontal ();
 		GUILayout.FlexibleSpace ();
-		if (GUILayout.Button ("Up", GUILayout.Width(40f)))
+		if (GUILayout.Button ("Up", GUILayout.Width(50f)))
 		{
 			rotateBoardParent (Vector2.up);
 		}
@@ -434,12 +441,12 @@ public class BoardEditor : EditorWindow
 		EditorGUILayout.EndHorizontal ();
 
 		EditorGUILayout.BeginHorizontal ();
-		if (GUILayout.Button ("Right", GUILayout.Width(40f)))
+		if (GUILayout.Button ("Right", GUILayout.Width(50f)))
 		{
 			rotateBoardParent (Vector2.right);
 		}
 
-		if (GUILayout.Button ("Left", GUILayout.Width(40f)))
+		if (GUILayout.Button ("Left", GUILayout.Width(50f)))
 		{
 			rotateBoardParent (Vector2.left);
 		}
@@ -447,7 +454,7 @@ public class BoardEditor : EditorWindow
 
 		EditorGUILayout.BeginHorizontal ();
 		GUILayout.FlexibleSpace ();
-		if (GUILayout.Button ("Down", GUILayout.Width(40f)))
+		if (GUILayout.Button ("Down", GUILayout.Width(50f)))
 		{
 			rotateBoardParent (Vector2.down);
 		}
