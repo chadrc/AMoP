@@ -42,10 +42,10 @@ public class BoardEditor : EditorWindow
     void OnFocus()
 	{
 		SceneView.onSceneGUIDelegate += onSceneGUI;
-		loadBoardDatas();
-		setupListeners ();
+        loadBoardDatas();
+        setupListeners();
 
-		checkSceneCam ();
+        //checkSceneCam();
     }
 
     void OnDestroy()
@@ -98,7 +98,7 @@ public class BoardEditor : EditorWindow
         }
         else
         {
-			checkSceneCam ();
+            checkSceneCam();
 
             if (GUILayout.Button("Unload Board"))
             {
@@ -117,7 +117,7 @@ public class BoardEditor : EditorWindow
             var originalClr = GUI.backgroundColor;
             EditorGUILayout.BeginHorizontal();
 
-            foreach(var e in (BoardEditorTabState[])Enum.GetValues(typeof(BoardEditorTabState)))
+            foreach (var e in (BoardEditorTabState[])Enum.GetValues(typeof(BoardEditorTabState)))
             {
                 GUI.backgroundColor = e == tabState ? highlightClr : originalClr;
                 bool pressed = e == tabState ? GUILayout.Button(e.ToString(), whiteText) : GUILayout.Button(e.ToString());
@@ -129,7 +129,7 @@ public class BoardEditor : EditorWindow
             }
 
             EditorGUILayout.EndHorizontal();
-            
+
             switch (tabState)
             {
                 case BoardEditorTabState.Nodes:
@@ -143,7 +143,7 @@ public class BoardEditor : EditorWindow
                 case BoardEditorTabState.Actions:
                     ActionsTabState();
                     break;
-			}
+            }
         }
     }
 
@@ -168,10 +168,10 @@ public class BoardEditor : EditorWindow
             }
 
 			bool deleted = deleteNode == node;
-			if (GUI.changed && index < editNodes.Count)
-			{
-				editNodes [index].InspectorEdited (deleted);
-			}
+            if (GUI.changed && index < editNodes.Count)
+            {
+                editNodes[index].InspectorEdited(deleted);
+            }
 
             index++;
         }
@@ -184,18 +184,14 @@ public class BoardEditor : EditorWindow
         }
     }
 
-    void OnProjectChanged()
-    {
-        loadBoardDatas();
-    }
-
     private void StatsTabState()
     {
         EditorGUILayout.LabelField("Scores");
 
         foreach (var pair in boardData.Scores)
         {
-            EditorGUILayout.IntField(pair.Key.ToString(), pair.Value);
+            int score = EditorGUILayout.IntField(pair.Key.ToString(), pair.Value);
+            boardData.Scores.SetScore(pair.Key, score);
         }
     }
 
@@ -204,17 +200,22 @@ public class BoardEditor : EditorWindow
 
     }
 
-	private void onSceneGUI(SceneView scene)
-	{
-		setupListeners ();
-		checkSceneCam ();
+    void OnProjectChanged()
+    {
+        loadBoardDatas();
+    }
 
-		if (boardData != null)
-		{
-			drawLegend ();
-			drawBoardRotator ();
-		}
-	}
+    private void onSceneGUI(SceneView scene)
+	{
+        setupListeners();
+        checkSceneCam();
+
+        if (boardData != null)
+        {
+            drawLegend();
+            drawBoardRotator();
+        }
+    }
 
 	private void checkSceneCam()
 	{
@@ -286,10 +287,12 @@ public class BoardEditor : EditorWindow
             boardParent = new GameObject("BoardParent");
         }
 
-		editNodes = new List<EditorBoardNodeBehavior> ();
+        setupListeners();
+
+        editNodes = new List<EditorBoardNodeBehavior> ();
         var nodes = boardData.Nodes;
         // Create edit nodes
-		for (int i=0; i<nodes.Count; i++)
+        for (int i=0; i<nodes.Count; i++)
         {
             var obj = new GameObject();
             obj.transform.SetParent(boardParent.transform);
@@ -405,63 +408,63 @@ public class BoardEditor : EditorWindow
 
 	private void drawBoardRotator()
 	{
-		var sceneViewRect = EditorWindow.GetWindow<SceneView> ().camera.pixelRect;
-		var controlRect = new Rect (
-			sceneViewRect.width - boardRotateControlWidth, 
-			sceneViewRect.height - boardRotateControlHeight, 
-			boardRotateControlWidth, 
-			boardRotateControlHeight);
+		//var sceneViewRect = EditorWindow.GetWindow<SceneView> ().camera.pixelRect;
+		//var controlRect = new Rect (
+		//	sceneViewRect.width - boardRotateControlWidth, 
+		//	sceneViewRect.height - boardRotateControlHeight, 
+		//	boardRotateControlWidth, 
+		//	boardRotateControlHeight);
 
-		var backClr = new Color (1f, 1f, 1f, .5f);
-		var style = new GUIStyle ();
-		style.normal.background = AMoPEditorUtils.MakeTex ((int)controlRect.width, (int)controlRect.height, backClr);
-		GUILayout.BeginArea (controlRect, style);
+		//var backClr = new Color (1f, 1f, 1f, .5f);
+		//var style = new GUIStyle ();
+		//style.normal.background = AMoPEditorUtils.MakeTex ((int)controlRect.width, (int)controlRect.height, backClr);
+		//GUILayout.BeginArea (controlRect, style);
 
-		EditorGUILayout.BeginVertical ();
+		//EditorGUILayout.BeginVertical ();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.FlexibleSpace ();
-		EditorGUILayout.LabelField ("Rotate Board");
-		GUILayout.FlexibleSpace ();
-		EditorGUILayout.EndHorizontal ();
+		//EditorGUILayout.BeginHorizontal ();
+		//GUILayout.FlexibleSpace ();
+		//EditorGUILayout.LabelField ("Rotate Board");
+		//GUILayout.FlexibleSpace ();
+		//EditorGUILayout.EndHorizontal ();
 
-		GUILayout.FlexibleSpace ();
+		//GUILayout.FlexibleSpace ();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.FlexibleSpace ();
-		if (GUILayout.Button ("Up", GUILayout.Width(50f)))
-		{
-			rotateBoardParent (Vector2.up);
-		}
-		GUILayout.FlexibleSpace ();
-		EditorGUILayout.EndHorizontal ();
+		//EditorGUILayout.BeginHorizontal ();
+		//GUILayout.FlexibleSpace ();
+		//if (GUILayout.Button ("Up", GUILayout.Width(50f)))
+		//{
+		//	rotateBoardParent (Vector2.up);
+		//}
+		//GUILayout.FlexibleSpace ();
+		//EditorGUILayout.EndHorizontal ();
 
-		EditorGUILayout.BeginHorizontal ();
-		if (GUILayout.Button ("Right", GUILayout.Width(50f)))
-		{
-			rotateBoardParent (Vector2.right);
-		}
+		//EditorGUILayout.BeginHorizontal ();
+		//if (GUILayout.Button ("Right", GUILayout.Width(50f)))
+		//{
+		//	rotateBoardParent (Vector2.right);
+		//}
 
-		if (GUILayout.Button ("Left", GUILayout.Width(50f)))
-		{
-			rotateBoardParent (Vector2.left);
-		}
-		EditorGUILayout.EndHorizontal ();
+		//if (GUILayout.Button ("Left", GUILayout.Width(50f)))
+		//{
+		//	rotateBoardParent (Vector2.left);
+		//}
+		//EditorGUILayout.EndHorizontal ();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.FlexibleSpace ();
-		if (GUILayout.Button ("Down", GUILayout.Width(50f)))
-		{
-			rotateBoardParent (Vector2.down);
-		}
-		GUILayout.FlexibleSpace ();
-		EditorGUILayout.EndHorizontal ();
+		//EditorGUILayout.BeginHorizontal ();
+		//GUILayout.FlexibleSpace ();
+		//if (GUILayout.Button ("Down", GUILayout.Width(50f)))
+		//{
+		//	rotateBoardParent (Vector2.down);
+		//}
+		//GUILayout.FlexibleSpace ();
+		//EditorGUILayout.EndHorizontal ();
 
-		GUILayout.FlexibleSpace ();
+		//GUILayout.FlexibleSpace ();
 
-		EditorGUILayout.EndVertical ();
+		//EditorGUILayout.EndVertical ();
 
-		GUILayout.EndArea ();
+		//GUILayout.EndArea ();
 	}
 
 	private void drawLegend()

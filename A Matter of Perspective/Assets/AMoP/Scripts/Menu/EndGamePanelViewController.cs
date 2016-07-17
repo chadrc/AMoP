@@ -18,19 +18,24 @@ public class EndGamePanelViewController : MonoBehaviour
     private Text energyTransfersText;
 
     [SerializeField]
+    private Slider scoreSlider;
+
+    [SerializeField]
     private Text scoreText;
+
+    [SerializeField]
+    private Text medalText;
 
     [SerializeField]
     private GridLayoutGroup buttonGrid;
 
     [SerializeField]
+    private GridLayoutGroup scoreGridLayout;
+
+    [SerializeField]
     private MenuViewController menu;
 
     private CanvasGroup canvasGroup;
-
-    private float timeTillPanelShows = 1.0f;
-    private float fadeInTime = .5f;
-    private float timeForGameTimeCountUp = 1.0f;
 
 	// Use this for initialization
 	void Awake ()
@@ -73,7 +78,9 @@ public class EndGamePanelViewController : MonoBehaviour
 
     private void onScreenChanged(int width, int height)
     {
-        buttonGrid.constraint = width >= height ? GridLayoutGroup.Constraint.FixedRowCount : GridLayoutGroup.Constraint.FixedColumnCount;
+        var constraint = width >= height ? GridLayoutGroup.Constraint.FixedRowCount : GridLayoutGroup.Constraint.FixedColumnCount;
+        buttonGrid.constraint = constraint;
+        scoreGridLayout.constraint = constraint;
     }
 
     private void OnGameEnd()
@@ -98,7 +105,7 @@ public class EndGamePanelViewController : MonoBehaviour
         while(timer < GameData.Constants.EndAnimationSlowDownEffectTime)
         {
             timer += Time.unscaledDeltaTime;
-            Time.timeScale = 1.0f - Mathf.Clamp01(timer / timeTillPanelShows);
+            Time.timeScale = 1.0f - Mathf.Clamp01(timer / GameData.Constants.EndAnimationSlowDownEffectTime);
             yield return new WaitForEndOfFrame();
         }
         
@@ -107,7 +114,7 @@ public class EndGamePanelViewController : MonoBehaviour
         while (timer < GameData.Constants.EndAnimationPanelFadeInTime)
         {
             timer += Time.unscaledDeltaTime;
-            canvasGroup.SetAlpha(timer / fadeInTime);
+            canvasGroup.SetAlpha(timer / GameData.Constants.EndAnimationPanelFadeInTime);
             yield return new WaitForEndOfFrame();
         }
         
@@ -115,7 +122,7 @@ public class EndGamePanelViewController : MonoBehaviour
         timer = 0;
         while (timer < GameData.Constants.EndAnimationTextAnimationTime)
         {
-            float frac = (timer / timeForGameTimeCountUp);
+            float frac = (timer / GameData.Constants.EndAnimationTextAnimationTime);
             displayStats(frac);
             timer += Time.unscaledDeltaTime;
             yield return new WaitForEndOfFrame();
@@ -130,16 +137,21 @@ public class EndGamePanelViewController : MonoBehaviour
         // Count up animation for final score
         timer = 0;
         int score = LevelBehavior.Current.Score;
+        int highestScore = LevelBehavior.Current.Scores.HighestScore;
         while (timer < GameData.Constants.EndAnimationTextAnimationTime)
         {
-            float frac = (timer / timeForGameTimeCountUp);
+            float frac = (timer / GameData.Constants.EndAnimationTextAnimationTime);
             float scoreDisplay = Mathf.Lerp(0, score, frac);
             scoreText.text = ((int)scoreDisplay).ToString();
+
+            float scoreFrac = scoreDisplay / highestScore;
+            scoreSlider.value = scoreFrac;
 
             timer += Time.unscaledDeltaTime;
             yield return new WaitForEndOfFrame();
         }
         scoreText.text = score.ToString();
+        medalText.text = LevelBehavior.Current.Scores.GetCompletionLevel(score).ToString();
     }
 
     private void displayStats(float t)

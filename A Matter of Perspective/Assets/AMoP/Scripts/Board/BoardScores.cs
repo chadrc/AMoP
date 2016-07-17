@@ -25,6 +25,17 @@ public class BoardScores : IEnumerable<Pair<BoardCompletionLevel, int>>
         }
     }
 
+    public void SetScore(BoardCompletionLevel level, int score)
+    {
+        if (level == BoardCompletionLevel.Completed)
+        {
+            Debug.LogError("Cannot set score for BoardCompletionLevel.Completed");
+            return;
+        }
+
+        scores[(int)level] = score;
+    }
+
     public BoardCompletionLevel GetCompletionLevel(int score)
     {
         int highest = -1;

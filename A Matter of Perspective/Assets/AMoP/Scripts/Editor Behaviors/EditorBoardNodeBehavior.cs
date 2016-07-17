@@ -69,8 +69,12 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	{
 		gameObject.name = "Board Node: " + index;
 		nodeIndex = index;
-        this.truePos = Data.Position - new Vector3(board.OffsetValue, board.OffsetValue, board.OffsetValue);
-		this.transform.localPosition = truePos;
+        if (Data == null)
+        {
+            return;
+        }
+        truePos = Data.Position - new Vector3(board.OffsetValue, board.OffsetValue, board.OffsetValue);
+		transform.localPosition = truePos;
 	}
 
 	public void InspectorEdited(bool delete = false)

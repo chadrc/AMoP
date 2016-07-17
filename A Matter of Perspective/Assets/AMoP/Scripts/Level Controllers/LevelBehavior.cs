@@ -29,6 +29,7 @@ public class LevelBehavior : MonoBehaviour
     private NodeButtonBehavior downButton;
     private bool playing = false;
 
+    public BoardScores Scores { get; private set; }
     public Board CurrentBoard { get; private set; }
     public EnergyPoolManager EnergyPoolManager { get; private set; }
     public bool HasNextLevel
@@ -121,6 +122,8 @@ public class LevelBehavior : MonoBehaviour
             Debug.LogError("No board data in series " + boardSeriesIndex + " with index " + startingBoardIndex);
             return;
         }
+
+        Scores = boardData.Scores;
         CurrentBoard = new Board(boardData, boardBehavior, boardNodeFactory);
         CurrentBoard.Behavior.Init(CurrentBoard);
         CurrentBoard.Behavior.SpinEnd += OnSpinEnd;
