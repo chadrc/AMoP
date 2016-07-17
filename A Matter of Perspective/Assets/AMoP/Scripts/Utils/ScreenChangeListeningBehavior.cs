@@ -14,9 +14,17 @@ public class ScreenChangeListeningBehavior : MonoBehaviour
         InitialScreenHeight = Screen.height;
         InitialScreenWidth = Screen.width;
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+    void Start()
+    {
+        if (ScreenChanged != null)
+        {
+            ScreenChanged(InitialScreenWidth, InitialScreenHeight);
+        }
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         if (Screen.width != InitialScreenWidth ||
             Screen.height != InitialScreenHeight)

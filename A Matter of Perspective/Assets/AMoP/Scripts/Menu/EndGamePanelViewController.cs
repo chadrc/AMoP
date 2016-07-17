@@ -94,23 +94,26 @@ public class EndGamePanelViewController : MonoBehaviour
     {
         float timer=0;
 
-        while(timer < timeTillPanelShows)
+        // Slowing time effect
+        while(timer < GameData.Constants.EndAnimationSlowDownEffectTime)
         {
             timer += Time.unscaledDeltaTime;
             Time.timeScale = 1.0f - Mathf.Clamp01(timer / timeTillPanelShows);
             yield return new WaitForEndOfFrame();
         }
         
+        // Fade in panel
         timer = 0;
-        while (timer < fadeInTime)
+        while (timer < GameData.Constants.EndAnimationPanelFadeInTime)
         {
             timer += Time.unscaledDeltaTime;
             canvasGroup.SetAlpha(timer / fadeInTime);
             yield return new WaitForEndOfFrame();
         }
         
+        // Count up animations for score values
         timer = 0;
-        while (timer < timeForGameTimeCountUp)
+        while (timer < GameData.Constants.EndAnimationTextAnimationTime)
         {
             float frac = (timer / timeForGameTimeCountUp);
             displayStats(frac);
@@ -118,13 +121,16 @@ public class EndGamePanelViewController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
+        // Make sure final numbers are shown
         displayStats(1.0f);
 
-        yield return new WaitForSecondsRealtime(.5f);
+        // Slight delay
+        yield return new WaitForSecondsRealtime(GameData.Constants.EndAnimationScoreDelay);
 
+        // Count up animation for final score
         timer = 0;
         int score = LevelBehavior.Current.Score;
-        while (timer < timeForGameTimeCountUp)
+        while (timer < GameData.Constants.EndAnimationTextAnimationTime)
         {
             float frac = (timer / timeForGameTimeCountUp);
             float scoreDisplay = Mathf.Lerp(0, score, frac);
