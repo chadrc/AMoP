@@ -15,6 +15,14 @@ public class BoardScores
     [SerializeField]
     private int[] scores = new int[3];
 
+    public int this[BoardCompletionLevel level]
+    {
+        get
+        {
+            return scores[(int)level];
+        }
+    }
+
     public int HighestScore
     {
         get
