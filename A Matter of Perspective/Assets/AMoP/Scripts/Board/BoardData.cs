@@ -1,6 +1,48 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+public enum BoardCompletionLevel : int
+{
+    Completed = -1,
+    Bronze = 0,
+    Silver = 1,
+    Gold = 2,
+}
+
+[System.Serializable]
+public class BoardScores
+{
+    [SerializeField]
+    private int[] scores = new int[3];
+
+    public int HighestScore
+    {
+        get
+        {
+            return scores[2];
+        }
+    }
+
+    public BoardCompletionLevel GetCompletionLevel(int score)
+    {
+        int highest = -1;
+        int current = 0;
+        foreach (var s in scores)
+        {
+            if (score >= s)
+            {
+                highest = current;
+                current++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        return (BoardCompletionLevel)highest;
+    }
+}
+
 public class BoardData : ScriptableObject
 {
     [SerializeField]
@@ -19,6 +61,10 @@ public class BoardData : ScriptableObject
     [SerializeField]
     private List<BoardNodeData> nodes = new List<BoardNodeData>();
     public List<BoardNodeData> Nodes { get { return new List<BoardNodeData>(nodes); } }
+
+    [SerializeField]
+    private BoardScores scores = new BoardScores();
+    public BoardScores Scores { get { return scores; } }
 
     public int MaxNodes { get { return boardSize * boardSize * boardSize; } }
     public float OffsetValue { get { return (BoardSize / 2f) - .5f; } }
