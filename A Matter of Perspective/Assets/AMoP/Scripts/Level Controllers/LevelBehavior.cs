@@ -45,7 +45,7 @@ public class LevelBehavior : MonoBehaviour
     public float GameTime { get; private set; }
     public int BoardTurnCount { get; private set; }
     public int EnergyTransferCount { get; private set; }
-    public int Score { get { return Mathf.RoundToInt(( gameTimeScore + boardTurnScore + energyTransferScore) * 1000); } }
+    public int Score { get { return Mathf.RoundToInt(( gameTimeScore + boardTurnScore + energyTransferScore) * GameData.Constants.ScoreMultiplier); } }
 
     private float gameTimeScore
     {
@@ -57,12 +57,12 @@ public class LevelBehavior : MonoBehaviour
             }
             else
             {
-                return 1f / GameTime;
+                return GameData.Constants.GameTimeWeight / GameTime;
             }
         }
     }
 
-    private int boardTurnScore
+    private float boardTurnScore
     {
         get
         {
@@ -72,12 +72,12 @@ public class LevelBehavior : MonoBehaviour
             }
             else
             {
-                return (1 / BoardTurnCount);
+                return GameData.Constants.BoardTurnsWeight / BoardTurnCount;
             }
         }
     }
 
-    private int energyTransferScore
+    private float energyTransferScore
     {
         get
         {
@@ -87,7 +87,7 @@ public class LevelBehavior : MonoBehaviour
             }
             else
             {
-                return (1 / EnergyTransferCount);
+                return GameData.Constants.EnergyTransfersWeight / EnergyTransferCount;
             }
         }
     }

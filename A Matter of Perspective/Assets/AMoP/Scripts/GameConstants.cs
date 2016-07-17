@@ -3,6 +3,21 @@
 public class GameConstants : ScriptableObject
 {
     #region Unity Inspector Fields
+
+    [Header("Scoring")]
+
+    [SerializeField]
+    private float gameTimeWeight;
+
+    [SerializeField]
+    private float boardTurnsWeight;
+
+    [SerializeField]
+    private float energyTransfersWeight;
+
+    [SerializeField]
+    private float scoreMultiplier;
+
     [Header("Node Values")]
 
     [SerializeField]
@@ -37,6 +52,11 @@ public class GameConstants : ScriptableObject
     #endregion
 
     #region Properties
+
+    public float GameTimeWeight { get { return gameTimeWeight; } }
+    public float BoardTurnsWeight { get { return boardTurnsWeight; } }
+    public float EnergyTransfersWeight { get { return energyTransfersWeight; } }
+    public float ScoreMultiplier { get { return scoreMultiplier; } }
 
     public float NodeMaxEnergy { get { return nodeMaxEnergy; } }
     public float DrainNodeDepletionRate { get { return drainNodeDepletionRate; } }
