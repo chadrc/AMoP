@@ -37,14 +37,21 @@ public static class AMoPEditorUtils
         EditorGUILayout.EndHorizontal();
     }
 
-    public static bool EditBoardNodeData(string label, BoardNodeData node)
+    public static bool EditBoardNodeData(string label, BoardNodeData node, int boardSize)
     {
         bool delete = false;
         EditorGUILayout.BeginHorizontal();
 
 		EditorGUILayout.LabelField(label, GUILayout.Width(editBoardNodeData_LabelWidth));
-        string[] posOptions = { "0", "1", "2", "3", "4", "5" };
-        int[] posOptionsVals = { 0, 1, 2, 3, 4, 5 };
+        string[] posOptions = new string[boardSize];
+        int[] posOptionsVals = new int[boardSize];
+
+        for (int i=0; i<boardSize; i++)
+        {
+            posOptions[i] = i.ToString();
+            posOptionsVals[i] = i;
+        }
+
 		int x = EditorGUILayout.IntPopup((int)node.Position.x, posOptions, posOptionsVals, GUILayout.Width(editBoardNodeData_PosElementWidth));
 		int y = EditorGUILayout.IntPopup((int)node.Position.y, posOptions, posOptionsVals, GUILayout.Width(editBoardNodeData_PosElementWidth));
 		int z = EditorGUILayout.IntPopup((int)node.Position.z, posOptions, posOptionsVals, GUILayout.Width(editBoardNodeData_PosElementWidth));

@@ -23,21 +23,21 @@ public class EditorBoardNodeInspector : Editor
 
     public override void OnInspectorGUI()
     {
-		if (node == null || node.Data == null)
-		{
-			EditorGUILayout.LabelField ("No Data");
-		}
-		else
-		{
-			EditorGUI.BeginChangeCheck ();
-			AMoPEditorUtils.EditBoardNodeDataHeader();
-			bool delete = AMoPEditorUtils.EditBoardNodeData("Node: ", node.Data);
+        if (node == null || node.Data == null)
+        {
+            EditorGUILayout.LabelField("No Data");
+        }
+        //else
+        //{
+        //	EditorGUI.BeginChangeCheck ();
+        //	AMoPEditorUtils.EditBoardNodeDataHeader();
+        //	bool delete = AMoPEditorUtils.EditBoardNodeData("Node: ", node.Data, );
 
-			if (EditorGUI.EndChangeCheck() || delete)
-			{
-				node.InspectorEdited (delete);
-			}
-		}
+        //	if (EditorGUI.EndChangeCheck() || delete)
+        //	{
+        //		node.InspectorEdited (delete);
+        //	}
+        //}
     }
 
 	private void OnSceneGUI()

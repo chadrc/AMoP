@@ -18,6 +18,20 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 		{BoardNodeType.Vortex, new Color(.5f, 0, .5f)},
 	};
 
+    private static float? nodeMaxEnergy;
+    private static float? NodeMaxEnergy
+    {
+        get
+        {
+            if (nodeMaxEnergy == null)
+            {
+                nodeMaxEnergy = GameObject.Find("GameData").GetComponent<GameData>().ConstantsData.NodeMaxEnergy;
+            }
+
+            return nodeMaxEnergy;
+        }
+    }
+
 	[SerializeField]
 	private int nodeIndex;
 
@@ -30,7 +44,7 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 	public BoardNodeData Data { get { return GetBoardNodeData == null ? null : GetBoardNodeData(NodeIndex); } }
 	public int NodeIndex { get { return nodeIndex; } }
 
-	private Vector3 truePos { get { return Data == null ? Vector3.zero : Data.Position - new Vector3 (2.5f, 2.5f, 2.5f); } }
+	private Vector3 truePos { get; set; }
 
 	// Mimic min and max scale of basic board node
 	private const float minSize = .5f * .25f;
@@ -43,15 +57,19 @@ public class EditorBoardNodeBehavior : MonoBehaviour
 			var clr = TypeColorMap [Data.Type];
 			clr.a = alpha;
 			Gizmos.color = clr;
-			float size = Mathf.Lerp (minSize, maxSize, Data.StartingEnergy / 20f);
-			Gizmos.DrawSphere(transform.position, size);
+            if (NodeMaxEnergy != null)
+            {
+                float size = Mathf.Lerp(minSize, maxSize, Data.StartingEnergy / (float)NodeMaxEnergy);
+                Gizmos.DrawSphere(transform.position, size);
+            }
 		}
     }
 
-	public void SetData(int index)
+	public void SetData(int index, BoardData board)
 	{
 		gameObject.name = "Board Node: " + index;
 		nodeIndex = index;
+        this.truePos = Data.Position - new Vector3(board.OffsetValue, board.OffsetValue, board.OffsetValue);
 		this.transform.localPosition = truePos;
 	}
 

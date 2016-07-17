@@ -12,6 +12,8 @@ public class GameData : MonoBehaviour
     [SerializeField]
     private GameConstants constants;
 
+    public GameConstants ConstantsData { get { return constants; } }
+
     void Awake()
     {
         if (Instance == null)

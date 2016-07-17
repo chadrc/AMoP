@@ -114,6 +114,8 @@ public class BoardEditor : EditorWindow
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
+            boardData.BoardSize = EditorGUILayout.IntSlider("Board Size: ", boardData.BoardSize, 3, 6);
+
             var originalClr = GUI.backgroundColor;
             EditorGUILayout.BeginHorizontal();
 
@@ -162,7 +164,7 @@ public class BoardEditor : EditorWindow
         nodeScrollPos = EditorGUILayout.BeginScrollView(nodeScrollPos);
         foreach (var node in boardData.Nodes)
         {
-            if (AMoPEditorUtils.EditBoardNodeData(index.ToString("000") + ": ", node))
+            if (AMoPEditorUtils.EditBoardNodeData(index.ToString("000") + ": ", node, boardData.BoardSize))
             {
                 deleteNode = node;
             }
@@ -290,7 +292,7 @@ public class BoardEditor : EditorWindow
             obj.transform.SetParent(boardParent.transform);
             var editNode = obj.AddComponent<EditorBoardNodeBehavior>();
 			editNodes.Add (editNode);
-			editNode.SetData (i);
+			editNode.SetData (i, boardData);
         }
 
 		hideShowNodes ();
@@ -389,7 +391,7 @@ public class BoardEditor : EditorWindow
 			int index = 0;
 			for (int i=0; i<editNodes.Count; i++)
 			{
-				editNodes [index].SetData (index);
+				editNodes [index].SetData (index, boardData);
 			}
 		}
 
