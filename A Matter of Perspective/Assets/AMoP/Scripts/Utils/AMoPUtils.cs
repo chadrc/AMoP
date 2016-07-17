@@ -89,8 +89,8 @@ public static class AMoPUtils
 
 	private static BehaviorRow GetBehaviorRow(List<MonoBehaviour> behaviors, int x, int y)
 	{
-		float posX = x - LevelBehavior.Current.CurrentBoard.OffsetValue;
-		float posY = y - LevelBehavior.Current.CurrentBoard.OffsetValue;
+		float posX = x;
+		float posY = y;
 
 		var xyNodes = new List<MonoBehaviour>();
 		foreach (var node in behaviors)

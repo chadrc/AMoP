@@ -68,7 +68,7 @@ public class Board : IEnumerable<BoardNode>
 
     public NodeRow GetNodeRow(int x, int y)
     {
-		return AMoPUtils.GetNodeRow (Nodes, x, y);
+		return AMoPUtils.GetNodeRow (Nodes, (int)(x - OffsetValue), (int)(y - OffsetValue));
     }
 
     public IEnumerator<BoardNode> GetEnumerator()

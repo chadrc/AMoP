@@ -21,6 +21,7 @@ public class BoardData : ScriptableObject
     public List<BoardNodeData> Nodes { get { return new List<BoardNodeData>(nodes); } }
 
     public int MaxNodes { get { return boardSize * boardSize * boardSize; } }
+    public float OffsetValue { get { return (BoardSize / 2f) - .5f; } }
 
     public void AddNode()
     {

@@ -168,7 +168,7 @@ public class BoardEditor : EditorWindow
             }
 
 			bool deleted = deleteNode == node;
-			if (GUI.changed)
+			if (GUI.changed && index < editNodes.Count)
 			{
 				editNodes [index].InspectorEdited (deleted);
 			}
@@ -180,6 +180,7 @@ public class BoardEditor : EditorWindow
         if (deleteNode != null)
         {
             boardData.RemoveNode(deleteNode);
+            reloadScene();
         }
     }
 
@@ -301,7 +302,7 @@ public class BoardEditor : EditorWindow
 		{
 			for (int y = 0; y < 6; y++)
 			{
-				var row = AMoPUtils.GetEditNodeRow (editNodes, x, y);
+				var row = AMoPUtils.GetEditNodeRow (editNodes, (int)(x-boardData.OffsetValue), (int)(y-boardData.OffsetValue));
 				row.Closest.Show ();
 				foreach (var h in row.Hidden)
 				{
@@ -322,7 +323,7 @@ public class BoardEditor : EditorWindow
 		{
 			for (int y = 0; y < 6; y++)
 			{
-				var row = AMoPUtils.GetEditNodeRow (editNodes, x, y);
+				var row = AMoPUtils.GetEditNodeRow (editNodes, (int)(x - boardData.OffsetValue), (int)(y - boardData.OffsetValue));
 				if (row.Closest != null)
 				{
 					row.Closest.Show ();
@@ -365,6 +366,7 @@ public class BoardEditor : EditorWindow
     private void addNewNode()
     {
         boardData.AddNode();
+        reloadScene();
     }
 
 	private BoardNodeData editNodeGetDataDelegate(int index)
