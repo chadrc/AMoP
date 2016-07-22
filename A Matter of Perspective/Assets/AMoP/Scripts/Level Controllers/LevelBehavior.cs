@@ -234,8 +234,15 @@ public class LevelBehavior : MonoBehaviour
         var fromNode = CurrentBoard.GetOffsetNode(down.XIndex, down.YIndex);
         var toNode = CurrentBoard.GetOffsetNode(up.XIndex, up.YIndex);
 
-        fromNode.SendEnergy(toNode);
-        EnergyTransferCount++;
+        if (fromNode != null && toNode != null)
+        {
+            float dist = Vector2.Distance(fromNode.Behavior.transform.position, toNode.Behavior.transform.position);
+            if (dist <= 1.25f)
+            {
+                fromNode.SendEnergy(toNode);
+                EnergyTransferCount++;
+            }
+        }
     }
 
     void OnSwipeOccurred(Vector2 dir)

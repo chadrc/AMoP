@@ -124,7 +124,10 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         {
             if (downButton != null && node.CanReceive)
             {
-                lastEnter.Hover();
+                if (AreNextToo(downButton, button))
+                {
+                    lastEnter.Hover();
+                }
             }
             else if (node.Affiliation == BoardNodeAffiliation.Player && node.CanSend)
             {
@@ -175,9 +178,12 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
                     var node = board.GetOffsetNode(lastEnter.XIndex, lastEnter.YIndex);
                     if (node != null)
                     {
-                        if (NodeSwipeOccurred != null)
+                        if (AreNextToo(lastEnter, downButton))
                         {
-                            NodeSwipeOccurred(downButton, lastEnter, MathUtils.ClosestCardinal(eventData.position - pointDown));
+                            if (NodeSwipeOccurred != null)
+                            {
+                                NodeSwipeOccurred(downButton, lastEnter, MathUtils.ClosestCardinal(eventData.position - pointDown));
+                            }
                         }
                     }
                     else
@@ -205,6 +211,15 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
         
         downButton = null;
+    }
+
+    private bool AreNextToo(NodeButtonBehavior button1, NodeButtonBehavior button2)
+    {
+        int xDif = Mathf.Abs(downButton.XIndex - lastEnter.XIndex);
+        int yDif = Mathf.Abs(downButton.YIndex - lastEnter.YIndex);
+
+        // If only a single one of them is equal to 1
+        return ((xDif == 1 || yDif == 1) && xDif != yDif);
     }
 
     private void RaiseSwipeOccurred(PointerEventData eventData)
