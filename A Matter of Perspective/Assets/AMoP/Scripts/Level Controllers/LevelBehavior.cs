@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using System.Collections;
+using System;
 
 public class LevelBehavior : MonoBehaviour
 {
@@ -138,6 +137,23 @@ public class LevelBehavior : MonoBehaviour
         if (GameStart != null)
         {
             GameStart();
+        }
+
+        if (boardData.InfoClassName != null && boardData.InfoClassName != "")
+        {
+            try
+            {
+                Type type = Type.GetType(boardData.InfoClassName);
+                var obj = gameObject.AddComponent(type);
+                if (!(obj is BaseBoardInfo))
+                {
+                    Debug.LogWarning("Info script does not inherit BaseBoardInfo.");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
     }
 

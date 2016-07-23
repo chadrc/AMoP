@@ -24,6 +24,10 @@ public class BoardData : ScriptableObject
     private BoardScores scores = new BoardScores();
     public BoardScores Scores { get { return scores; } }
 
+    [SerializeField]
+    private string infoClassName;
+    public string InfoClassName { get { return infoClassName; } }
+
     public int MaxNodes { get { return boardSize * boardSize * boardSize; } }
     public float OffsetValue { get { return (BoardSize / 2f) - .5f; } }
 
