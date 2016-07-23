@@ -103,10 +103,10 @@ public class EditorBoardNodeInspector : Editor
 
         GUILayout.EndArea();
 
-        //if (GUI.changed || delete)
-        //{
-        //	node.InspectorEdited (delete);
-        //}
+        if (GUI.changed || delete)
+        {
+            node.InspectorEdited(delete);
+        }
 
         Handles.EndGUI();
 
