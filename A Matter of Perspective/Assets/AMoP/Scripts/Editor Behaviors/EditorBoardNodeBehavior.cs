@@ -66,7 +66,7 @@ public class EditorBoardNodeBehavior : MonoBehaviour
     }
 
 	public void SetData(int index, BoardData board)
-	{
+    { 
 		gameObject.name = "Board Node: " + index;
 		nodeIndex = index;
         if (Data == null)

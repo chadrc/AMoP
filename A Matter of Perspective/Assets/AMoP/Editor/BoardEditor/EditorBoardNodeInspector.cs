@@ -23,21 +23,22 @@ public class EditorBoardNodeInspector : Editor
 
     public override void OnInspectorGUI()
     {
+        EditorGUILayout.LabelField("Node: " + node.NodeIndex);
         if (node == null || node.Data == null)
         {
             EditorGUILayout.LabelField("No Data");
         }
-        //else
-        //{
-        //	EditorGUI.BeginChangeCheck ();
-        //	AMoPEditorUtils.EditBoardNodeDataHeader();
-        //	bool delete = AMoPEditorUtils.EditBoardNodeData("Node: ", node.Data, );
+        else
+        {
+            //EditorGUI.BeginChangeCheck();
+            //AMoPEditorUtils.EditBoardNodeDataHeader();
+            //bool delete = AMoPEditorUtils.EditBoardNodeData("Node: ", node.Data,);
 
-        //	if (EditorGUI.EndChangeCheck() || delete)
-        //	{
-        //		node.InspectorEdited (delete);
-        //	}
-        //}
+            //if (EditorGUI.EndChangeCheck() || delete)
+            //{
+            //    node.InspectorEdited(delete);
+            //}
+        }
     }
 
 	private void OnSceneGUI()
@@ -47,72 +48,72 @@ public class EditorBoardNodeInspector : Editor
 			return;
 		}
 
-		Handles.BeginGUI ();
+        Handles.BeginGUI();
 
-		var sceneViewRect = EditorWindow.GetWindow<SceneView> ().camera.pixelRect;
-		var controlRect = new Rect (0, sceneViewRect.height - controlsHeight, controlsWidth, controlsHeight);
-		var backClr = new Color (1f, 1f, 1f, .5f);
-		var style = new GUIStyle ();
-		style.normal.background = AMoPEditorUtils.MakeTex ((int)controlRect.width, (int)controlRect.height, backClr);
-		GUILayout.BeginArea (controlRect, style);
+        var sceneViewRect = Camera.current.pixelRect;
+        var controlRect = new Rect(0, sceneViewRect.height - controlsHeight, controlsWidth, controlsHeight);
+        var backClr = new Color(1f, 1f, 1f, .5f);
+        var style = new GUIStyle();
+        style.normal.background = AMoPEditorUtils.MakeTex((int)controlRect.width, (int)controlRect.height, backClr);
+        GUILayout.BeginArea(controlRect, style);
 
-		GUILayout.Label ("Controls [" + node.name + "]");
+        GUILayout.Label("Controls [" + node.name + "]");
 
-		GUILayout.BeginHorizontal (GUILayout.Width (controlsWidth));
-		GUILayout.BeginVertical (GUILayout.Width(100f));
+        GUILayout.BeginHorizontal(GUILayout.Width(controlsWidth));
+        GUILayout.BeginVertical(GUILayout.Width(100f));
 
-		Vector3 pos;
-		pos.x = IncDecControl ("Pos X: ", node.Data.Position.x);
-		pos.y = IncDecControl ("Pos Y: ", node.Data.Position.y);
-		pos.z = IncDecControl ("Pos Z: ", node.Data.Position.z);
-		node.Data.Position = pos;
+        Vector3 pos;
+        pos.x = IncDecControl("Pos X: ", node.Data.Position.x);
+        pos.y = IncDecControl("Pos Y: ", node.Data.Position.y);
+        pos.z = IncDecControl("Pos Z: ", node.Data.Position.z);
+        node.Data.Position = pos;
 
-		GUILayout.EndVertical ();
+        GUILayout.EndVertical();
 
-		GUILayout.BeginVertical ();
+        GUILayout.BeginVertical();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.Label ("Energy:", GUILayout.Width(70f));
-		node.Data.StartingEnergy = EditorGUILayout.IntField ((int)node.Data.StartingEnergy, GUILayout.Width (50f));
-		EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Energy:", GUILayout.Width(70f));
+        node.Data.StartingEnergy = EditorGUILayout.IntField((int)node.Data.StartingEnergy, GUILayout.Width(50f));
+        EditorGUILayout.EndHorizontal();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.Label ("Type:", GUILayout.Width(70f));
-		node.Data.Type = (BoardNodeType)EditorGUILayout.EnumPopup(node.Data.Type, GUILayout.Width(70f));
-		EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Type:", GUILayout.Width(70f));
+        node.Data.Type = (BoardNodeType)EditorGUILayout.EnumPopup(node.Data.Type, GUILayout.Width(70f));
+        EditorGUILayout.EndHorizontal();
 
-		EditorGUILayout.BeginHorizontal ();
-		GUILayout.Label ("Affiliation:", GUILayout.Width(70f));
-		node.Data.Affiliation = (BoardNodeAffiliation)EditorGUILayout.EnumPopup(node.Data.Affiliation, GUILayout.Width(70f));
-		EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Affiliation:", GUILayout.Width(70f));
+        node.Data.Affiliation = (BoardNodeAffiliation)EditorGUILayout.EnumPopup(node.Data.Affiliation, GUILayout.Width(70f));
+        EditorGUILayout.EndHorizontal();
 
-		bool delete = false;
-		var oldClr = GUI.backgroundColor;
-		GUI.backgroundColor = Color.red;
-		if (GUILayout.Button ("Delete Node", GUILayout.Width(100f)))
-		{
-			delete = true;
-		}
+        bool delete = false;
+        var oldClr = GUI.backgroundColor;
+        GUI.backgroundColor = Color.red;
+        if (GUILayout.Button("Delete Node", GUILayout.Width(100f)))
+        {
+            delete = true;
+        }
 
-		GUI.backgroundColor = oldClr;
+        GUI.backgroundColor = oldClr;
 
-		GUILayout.EndVertical ();
+        GUILayout.EndVertical();
 
-		GUILayout.EndHorizontal ();
+        GUILayout.EndHorizontal();
 
-		GUILayout.EndArea ();
+        GUILayout.EndArea();
 
-		if (GUI.changed || delete)
-		{
-			node.InspectorEdited (delete);
-		}
+        //if (GUI.changed || delete)
+        //{
+        //	node.InspectorEdited (delete);
+        //}
 
-		Handles.EndGUI ();
+        Handles.EndGUI();
 
-		Handles.DrawWireDisc (node.transform.position, Vector3.back, .5f);
-	}
+        Handles.DrawWireDisc(node.transform.position, Vector3.back, .5f);
+    }
 
-	private float IncDecControl(String label, float value)
+    private float IncDecControl(String label, float value)
 	{
 		GUILayout.BeginVertical ();
 		GUILayout.Label (label + value);

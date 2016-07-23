@@ -41,7 +41,7 @@ public class BoardEditor : EditorWindow
 
     void OnFocus()
 	{
-		SceneView.onSceneGUIDelegate += onSceneGUI;
+        SceneView.onSceneGUIDelegate += onSceneGUI;
         loadBoardDatas();
         setupListeners();
 
@@ -179,6 +179,7 @@ public class BoardEditor : EditorWindow
 
         if (deleteNode != null)
         {
+            Debug.Log("Deleting Node");
             boardData.RemoveNode(deleteNode);
             reloadScene();
         }
@@ -231,12 +232,12 @@ public class BoardEditor : EditorWindow
 	}
 
 	private void setupListeners()
-	{
-		if (EditorBoardNodeBehavior.GetBoardNodeData == null)
-		{
-			EditorBoardNodeBehavior.GetBoardNodeData += editNodeGetDataDelegate;
-			EditorBoardNodeBehavior.Edited += onNodeEdited;
-		}
+    {
+        EditorBoardNodeBehavior.GetBoardNodeData -= editNodeGetDataDelegate;
+        EditorBoardNodeBehavior.Edited -= onNodeEdited;
+
+        EditorBoardNodeBehavior.GetBoardNodeData += editNodeGetDataDelegate;
+		EditorBoardNodeBehavior.Edited += onNodeEdited;
 	}
 
     private void loadBoardDatas()
@@ -287,8 +288,6 @@ public class BoardEditor : EditorWindow
             boardParent = new GameObject("BoardParent");
         }
 
-        setupListeners();
-
         editNodes = new List<EditorBoardNodeBehavior> ();
         var nodes = boardData.Nodes;
         // Create edit nodes
@@ -302,6 +301,8 @@ public class BoardEditor : EditorWindow
         }
 
 		hideShowNodes ();
+
+        setupListeners();
     }
 
 	private void showAllNodes()
@@ -408,116 +409,117 @@ public class BoardEditor : EditorWindow
 
 	private void drawBoardRotator()
 	{
-		//var sceneViewRect = EditorWindow.GetWindow<SceneView> ().camera.pixelRect;
-		//var controlRect = new Rect (
-		//	sceneViewRect.width - boardRotateControlWidth, 
-		//	sceneViewRect.height - boardRotateControlHeight, 
-		//	boardRotateControlWidth, 
-		//	boardRotateControlHeight);
+        //var sceneViewRect = EditorWindow.GetWindow<SceneView>().camera.pixelRect;
+        var sceneViewRect = Camera.current.pixelRect;
+        var controlRect = new Rect(
+            sceneViewRect.width - boardRotateControlWidth,
+            sceneViewRect.height - boardRotateControlHeight,
+            boardRotateControlWidth,
+            boardRotateControlHeight);
 
-		//var backClr = new Color (1f, 1f, 1f, .5f);
-		//var style = new GUIStyle ();
-		//style.normal.background = AMoPEditorUtils.MakeTex ((int)controlRect.width, (int)controlRect.height, backClr);
-		//GUILayout.BeginArea (controlRect, style);
+        var backClr = new Color(1f, 1f, 1f, .5f);
+        var style = new GUIStyle();
+        style.normal.background = AMoPEditorUtils.MakeTex((int)controlRect.width, (int)controlRect.height, backClr);
+        GUILayout.BeginArea(controlRect, style);
 
-		//EditorGUILayout.BeginVertical ();
+        EditorGUILayout.BeginVertical();
 
-		//EditorGUILayout.BeginHorizontal ();
-		//GUILayout.FlexibleSpace ();
-		//EditorGUILayout.LabelField ("Rotate Board");
-		//GUILayout.FlexibleSpace ();
-		//EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.LabelField("Rotate Board");
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
 
-		//GUILayout.FlexibleSpace ();
+        GUILayout.FlexibleSpace();
 
-		//EditorGUILayout.BeginHorizontal ();
-		//GUILayout.FlexibleSpace ();
-		//if (GUILayout.Button ("Up", GUILayout.Width(50f)))
-		//{
-		//	rotateBoardParent (Vector2.up);
-		//}
-		//GUILayout.FlexibleSpace ();
-		//EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Up", GUILayout.Width(50f)))
+        {
+            rotateBoardParent(Vector2.up);
+        }
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
 
-		//EditorGUILayout.BeginHorizontal ();
-		//if (GUILayout.Button ("Right", GUILayout.Width(50f)))
-		//{
-		//	rotateBoardParent (Vector2.right);
-		//}
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Right", GUILayout.Width(50f)))
+        {
+            rotateBoardParent(Vector2.right);
+        }
 
-		//if (GUILayout.Button ("Left", GUILayout.Width(50f)))
-		//{
-		//	rotateBoardParent (Vector2.left);
-		//}
-		//EditorGUILayout.EndHorizontal ();
+        if (GUILayout.Button("Left", GUILayout.Width(50f)))
+        {
+            rotateBoardParent(Vector2.left);
+        }
+        EditorGUILayout.EndHorizontal();
 
-		//EditorGUILayout.BeginHorizontal ();
-		//GUILayout.FlexibleSpace ();
-		//if (GUILayout.Button ("Down", GUILayout.Width(50f)))
-		//{
-		//	rotateBoardParent (Vector2.down);
-		//}
-		//GUILayout.FlexibleSpace ();
-		//EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Down", GUILayout.Width(50f)))
+        {
+            rotateBoardParent(Vector2.down);
+        }
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
 
-		//GUILayout.FlexibleSpace ();
+        GUILayout.FlexibleSpace();
 
-		//EditorGUILayout.EndVertical ();
+        EditorGUILayout.EndVertical();
 
-		//GUILayout.EndArea ();
-	}
+        GUILayout.EndArea();
+    }
 
 	private void drawLegend()
 	{
-		var typeArray = (BoardNodeType[])Enum.GetValues (typeof(BoardNodeType));
-		float legendHeight = typeArray.Length * legendItemHeight;
+        var typeArray = (BoardNodeType[])Enum.GetValues(typeof(BoardNodeType));
+        float legendHeight = typeArray.Length * legendItemHeight;
 
-		GUILayout.BeginArea (new Rect (0, 0, legendItemWidth+20f, legendHeight+70f));
+        GUILayout.BeginArea(new Rect(0, 0, legendItemWidth + 20f, legendHeight + 70f));
 
-		if (showLegend)
-		{
-			if (GUILayout.Button ("Hide Legend", GUILayout.Width (legendItemWidth)))
-			{
-				showLegend = false;
-				return;
-			}
+        if (showLegend)
+        {
+            if (GUILayout.Button("Hide Legend", GUILayout.Width(legendItemWidth)))
+            {
+                showLegend = false;
+                return;
+            }
 
-			var backClr = new Color (1f, 1f, 1f, .5f);
-			var style = new GUIStyle ();
-			style.normal.background = AMoPEditorUtils.MakeTex ((int)legendItemWidth, (int)legendHeight, backClr);
-			GUILayout.BeginVertical (style, GUILayout.Width (legendItemWidth), GUILayout.Height(legendHeight+20f));
-			foreach (var type in typeArray)
-			{
-				Texture2D texture = new Texture2D(1, 1);
-				texture.SetPixel(0,0,EditorBoardNodeBehavior.TypeColorMap [type]);
-				texture.Apply();
-				var oldBackground = GUI.skin.box.normal.background;
-				GUI.skin.box.normal.background = texture;
+            var backClr = new Color(1f, 1f, 1f, .5f);
+            var style = new GUIStyle();
+            style.normal.background = AMoPEditorUtils.MakeTex((int)legendItemWidth, (int)legendHeight, backClr);
+            GUILayout.BeginVertical(style, GUILayout.Width(legendItemWidth), GUILayout.Height(legendHeight + 20f));
+            foreach (var type in typeArray)
+            {
+                Texture2D texture = new Texture2D(1, 1);
+                texture.SetPixel(0, 0, EditorBoardNodeBehavior.TypeColorMap[type]);
+                texture.Apply();
+                var oldBackground = GUI.skin.box.normal.background;
+                GUI.skin.box.normal.background = texture;
 
-				GUILayout.BeginHorizontal (GUILayout.Width (legendItemWidth));
+                GUILayout.BeginHorizontal(GUILayout.Width(legendItemWidth));
 
-				GUILayout.Label (type.ToString () + " -> ", GUILayout.Width(legendItemWidth - legendItemHeight));
-				GUILayout.Box (GUIContent.none, GUILayout.Width(legendItemHeight));
+                GUILayout.Label(type.ToString() + " -> ", GUILayout.Width(legendItemWidth - legendItemHeight));
+                GUILayout.Box(GUIContent.none, GUILayout.Width(legendItemHeight));
 
-				GUILayout.EndHorizontal ();
+                GUILayout.EndHorizontal();
 
-				GUI.skin.box.normal.background = oldBackground;
-			}
+                GUI.skin.box.normal.background = oldBackground;
+            }
 
-			GUILayout.EndVertical ();
-		}
-		else
-		{
-			if (GUILayout.Button ("Show Legend", GUILayout.Width (legendItemWidth)))
-			{
-				showLegend = true;
-			}
-		}
+            GUILayout.EndVertical();
+        }
+        else
+        {
+            if (GUILayout.Button("Show Legend", GUILayout.Width(legendItemWidth)))
+            {
+                showLegend = true;
+            }
+        }
 
-		GUILayout.EndArea ();
-	}
+        GUILayout.EndArea();
+    }
 
-	private void rotateBoardParent(Vector2 dir)
+    private void rotateBoardParent(Vector2 dir)
 	{
 		var boardParent = GameObject.Find ("BoardParent");
 		if (boardParent == null)
