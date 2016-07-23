@@ -15,12 +15,19 @@ public class OptionsViewController : MonoBehaviour
     private GridLayoutGroup volumeSliderGrid;
 
     private CanvasGroup canvasGroup;
+    private CanvasGroup toShow;
 
     void Awake()
     {
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
         canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.Hide();
+    }
+
+    public void Show(CanvasGroup toShowOnHide)
+    {
+        canvasGroup.Show();
+        toShow = toShowOnHide;
     }
 
     public void OnMaterVolumeSliderChanged(float value)
@@ -41,7 +48,7 @@ public class OptionsViewController : MonoBehaviour
     public void OnCloseButtonPressed()
     {
         canvasGroup.Hide();
-        mainMenuCanvas.Show();
+        toShow.Show();
     }
     
     private void onScreenChanged(int width, int height)

@@ -6,7 +6,7 @@ using System.Collections;
 public class MenuViewController : MonoBehaviour
 {
     [SerializeField]
-    private CanvasGroup optionsCanvasGroup;
+    private OptionsViewController optionsViewController;
 
     [SerializeField]
     private CanvasGroup storeCanvasGroup;
@@ -42,7 +42,7 @@ public class MenuViewController : MonoBehaviour
     public void OptionsButtonPressed()
     {
         canvasGroup.Hide();
-        optionsCanvasGroup.Show();
+        optionsViewController.Show(canvasGroup);
     }
 
     public void StoreButtonPressed()

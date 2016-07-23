@@ -16,7 +16,7 @@ public class GameMenuViewController : MonoBehaviour
     private CanvasGroup inGamePanel;
 
     [SerializeField]
-    private CanvasGroup optionsPanel;
+    private OptionsViewController optionsViewController;
 
     private CanvasGroup canvasGroup;
 
@@ -61,7 +61,8 @@ public class GameMenuViewController : MonoBehaviour
 
     public void OnOptionsButtonPressed()
     {
-
+        canvasGroup.Hide();
+        optionsViewController.Show(canvasGroup);
     }
 
     private void onGameStart()
@@ -73,6 +74,5 @@ public class GameMenuViewController : MonoBehaviour
 
     private void onScreenChanged(int width, int height)
     {
-        gridLayout.constraintCount = width > height ? 2 : 1;
     }
 }
