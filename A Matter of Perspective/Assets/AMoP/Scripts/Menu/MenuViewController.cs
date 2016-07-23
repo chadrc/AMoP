@@ -9,6 +9,9 @@ public class MenuViewController : MonoBehaviour
     private CanvasGroup optionsCanvasGroup;
 
     [SerializeField]
+    private CanvasGroup storeCanvasGroup;
+
+    [SerializeField]
     private VerticalLayoutGroup buttonLayoutGroup;
 
     private CanvasGroup canvasGroup;
@@ -44,7 +47,8 @@ public class MenuViewController : MonoBehaviour
 
     public void StoreButtonPressed()
     {
-
+        canvasGroup.Hide();
+        storeCanvasGroup.Show();
     }
 
     private void OnGameEnd()
