@@ -26,6 +26,11 @@ public class StoreMenuViewController : MonoBehaviour
         mainMenuCanvasGroup.Show();
     }
 
+    public void OnRestorePurchasesButtonPressed()
+    {
+
+    }
+
     private void onScreenChanged(int width, int height)
     {
         if (width > height)
