@@ -37,85 +37,6 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         StartCoroutine(initialize());
     }
 
-    private void reset()
-    {
-        foreach (var button in nodeButtons)
-        {
-            button.Uninit();
-            GameObject.Destroy(button.gameObject);
-        }
-        nodeButtons.Clear();
-        StartCoroutine(initialize());
-    }
-
-    private void onGameStart()
-    {
-        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd += onBoardSpin;
-        reset();
-    }
-
-    private void onGameEnd()
-    {
-        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd -= onBoardSpin;
-    }
-
-    private void onScreenChanged(int width, int height)
-    {
-        reset();
-    }
-
-    private void onBoardSpin()
-    {
-        foreach(var button in nodeButtons)
-        {
-            button.FindNode();
-        }
-    }
-
-    private IEnumerator initialize()
-    {
-        // Need to wait for camera to update fully before recreating buttons
-        yield return new WaitForEndOfFrame();
-
-        if (LevelBehavior.Current.CurrentBoard != null)
-        {
-            float ratio = Screen.width / (float)Screen.height;
-
-            if (ratio >= 1.0f)
-            {
-                // Landscape
-                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize);
-            }
-            else
-            {
-                // Portrait
-                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize) / ratio;
-            }
-
-            float boardSize = LevelBehavior.Current.CurrentBoard.BoardSize;
-            for (int i = 0; i < boardSize; i++)
-            {
-                for (int j = 0; j < boardSize; j++)
-                {
-                    createButton(i, j);
-                }
-            }
-        }
-    }
-
-    private void createButton(int x, int y)
-    {
-        var btnObj = GameObject.Instantiate(nodeButtonPrefab) as GameObject;
-        var behavior = btnObj.GetComponent<NodeButtonBehavior>();
-        btnObj.transform.SetParent(transform);
-        btnObj.transform.localScale = Vector3.one;
-        float offset = LevelBehavior.Current.CurrentBoard.OffsetValue;
-        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - offset, y - offset, 0));
-        (btnObj.transform as RectTransform).anchoredPosition = pos;
-        behavior.Init(this, x, y);
-        nodeButtons.Add(behavior);
-    }
-
     public void ButtonEnter(NodeButtonBehavior button, PointerEventData data)
     {
         lastEnter = button;
@@ -165,6 +86,19 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         }
     }
 
+    public NodeButtonBehavior GetButton(int x, int y)
+    {
+        int rowSize = LevelBehavior.Current.CurrentBoard.BoardSize;
+        int index = x * rowSize + y;
+        if (index >= nodeButtons.Count)
+        {
+            Debug.LogError("Calculated index is out of range [" + index + "]: (" + x + ", " + y + ")");
+            return null;
+        }
+
+        return nodeButtons[index];
+    }
+
     public void OnPointerUp(PointerEventData eventData)
     {
         if (downButton != null)
@@ -209,8 +143,87 @@ public class NodeButtonPanelViewController : MonoBehaviour, IPointerDownHandler,
         {
             RaiseSwipeOccurred(eventData);
         }
-        
+
         downButton = null;
+    }
+
+    private void reset()
+    {
+        foreach (var button in nodeButtons)
+        {
+            button.Uninit();
+            GameObject.Destroy(button.gameObject);
+        }
+        nodeButtons.Clear();
+        StartCoroutine(initialize());
+    }
+
+    private void onGameStart()
+    {
+        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd += onBoardSpin;
+        reset();
+    }
+
+    private void onGameEnd()
+    {
+        LevelBehavior.Current.CurrentBoard.Behavior.SpinEnd -= onBoardSpin;
+    }
+
+    private void onScreenChanged(int width, int height)
+    {
+        reset();
+    }
+
+    private void onBoardSpin()
+    {
+        foreach(var button in nodeButtons)
+        {
+            button.FindNode();
+        }
+    }
+
+    private IEnumerator initialize()
+    {
+        // Need to wait for camera to update fully before recreating buttons
+        yield return new WaitForEndOfFrame();
+        
+        if (LevelBehavior.Current.CurrentBoard != null)
+        {
+            float ratio = Screen.width / (float)Screen.height;
+
+            if (ratio >= 1.0f)
+            {
+                // Landscape
+                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize);
+            }
+            else
+            {
+                // Portrait
+                Camera.main.orthographicSize = AMoPUtils.GetOrthoSizeForBoardSize(LevelBehavior.Current.CurrentBoard.BoardSize) / ratio;
+            }
+
+            float boardSize = LevelBehavior.Current.CurrentBoard.BoardSize;
+            for (int i = 0; i < boardSize; i++)
+            {
+                for (int j = 0; j < boardSize; j++)
+                {
+                    createButton(i, j);
+                }
+            }
+        }
+    }
+
+    private void createButton(int x, int y)
+    {
+        var btnObj = GameObject.Instantiate(nodeButtonPrefab) as GameObject;
+        var behavior = btnObj.GetComponent<NodeButtonBehavior>();
+        btnObj.transform.SetParent(transform);
+        btnObj.transform.localScale = Vector3.one;
+        float offset = LevelBehavior.Current.CurrentBoard.OffsetValue;
+        Vector3 pos = Camera.main.WorldToScreenPoint(new Vector3(x - offset, y - offset, 0));
+        (btnObj.transform as RectTransform).anchoredPosition = pos;
+        behavior.Init(this, x, y);
+        nodeButtons.Add(behavior);
     }
 
     private bool AreNextToo(NodeButtonBehavior button1, NodeButtonBehavior button2)

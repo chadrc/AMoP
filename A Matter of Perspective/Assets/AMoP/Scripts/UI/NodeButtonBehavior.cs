@@ -13,6 +13,8 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerE
     public NodeButtonPanelViewController Controller { get; private set; }
     public int XIndex { get; private set; }
     public int YIndex { get; private set; }
+    public Vector2 Position { get { return ((RectTransform)transform).anchoredPosition; } }
+    public float Size { get { return ((RectTransform)graphic.transform).rect.width; } }
 
     private CanvasGroup canvasGroup;
 
@@ -32,8 +34,7 @@ public class NodeButtonBehavior : MonoBehaviour, IPointerEnterHandler, IPointerE
         var rectTransform = graphic.transform as RectTransform;
         float heightRatio = 1.0f / (Camera.main.orthographicSize * 2);
         float pixelHeight = Screen.height * heightRatio;
-        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, pixelHeight);
-        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, pixelHeight);
+        rectTransform.SetSize(pixelHeight);
 
         FindNode();
     }

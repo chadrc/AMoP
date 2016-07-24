@@ -17,4 +17,10 @@ public static class AMoPExtensions
         canvasGroup.alpha = alpha;
         canvasGroup.interactable = canvasGroup.blocksRaycasts = (alpha > 0);
     }
+
+    public static void SetSize(this RectTransform rectTransform, float size)
+    {
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size);
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
+    }
 }

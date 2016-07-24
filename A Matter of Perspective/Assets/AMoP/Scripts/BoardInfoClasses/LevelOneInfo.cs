@@ -3,9 +3,8 @@ using System.Collections;
 
 public class LevelOneInfo : BaseBoardInfo
 {
-    protected override void Start()
+    protected override void setup()
     {
-        base.Start();
-        Debug.Log("Level One Info Start");
+        infoController.Highlight(0, 0, Color.red);
     }
 }

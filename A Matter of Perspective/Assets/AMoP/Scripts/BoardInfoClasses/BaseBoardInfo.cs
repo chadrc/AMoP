@@ -5,7 +5,7 @@ public abstract class BaseBoardInfo : MonoBehaviour
 {
     protected BoardInfoViewController infoController;
 
-	protected virtual void Awake ()
+	private void Awake ()
     {
         var obj = GameObject.Find("BoardInfoTools");
         if (obj == null)
@@ -22,13 +22,18 @@ public abstract class BaseBoardInfo : MonoBehaviour
         }
 	}
 
-    protected virtual void Start ()
+    private void Start ()
     {
-
+        StartCoroutine(setupRoutine());
     }
 
-    protected virtual void Update()
+    private IEnumerator setupRoutine()
     {
-
+        // Accounting for Node button panels wait for end of frame in its init
+        // that is waiting for camera to update
+        yield return new WaitForEndOfFrame();
+        setup();
     }
+
+    protected abstract void setup();
 }
