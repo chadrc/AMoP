@@ -26,7 +26,7 @@ public class BoardData : ScriptableObject
 
     [SerializeField]
     private string infoClassName;
-    public string InfoClassName { get { return infoClassName; } }
+    public string InfoClassName { get { return infoClassName; } set  {  infoClassName = value; } }
 
     public int MaxNodes { get { return boardSize * boardSize * boardSize; } }
     public float OffsetValue { get { return (BoardSize / 2f) - .5f; } }

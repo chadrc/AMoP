@@ -187,6 +187,8 @@ public class BoardEditor : EditorWindow
 
     private void StatsTabState()
     {
+        boardData.InfoClassName = EditorGUILayout.TextField("Info Class Name:", boardData.InfoClassName);
+
         EditorGUILayout.LabelField("Scores");
 
         foreach (var pair in boardData.Scores)
