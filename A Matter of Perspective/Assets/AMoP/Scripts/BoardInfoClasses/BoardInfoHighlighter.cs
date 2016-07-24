@@ -25,6 +25,7 @@ public class BoardInfoHighlighter : MonoBehaviour
         rectTransform.anchoredPosition = button.Position;
         imageRectTransform.SetSize(button.Size);
         canvasGroup.Show();
+        canvasGroup.interactable = false;
     }
 
     public void SetColor(Color color)

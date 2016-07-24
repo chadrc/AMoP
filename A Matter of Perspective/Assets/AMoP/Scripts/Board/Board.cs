@@ -33,6 +33,7 @@ public class Board : IEnumerable<BoardNode>
             return new Vector3(OffsetValue, OffsetValue, OffsetValue);
         }
     }
+    public int CapturableNodeCount { get; private set; }
 
     public Board(BoardData data, BoardBehavior behavior, BoardNodeFactory nodeFactory)
     {
@@ -99,6 +100,10 @@ public class Board : IEnumerable<BoardNode>
     private void makeNode(BoardNodeData data)
     {
         BoardNode node = nodeFactory.CreateNode(data, this);
+        if (node.CanReceive)
+        {
+            CapturableNodeCount++;
+        }
         nodes.Add(node);
     }
 }
