@@ -32,4 +32,14 @@ public class BoardInfoHighlighter : MonoBehaviour
     {
         highlighterImage.color = color;
     }
+
+    public void Show()
+    {
+        canvasGroup.Show();
+    }
+
+    public void Hide()
+    {
+        canvasGroup.Hide();
+    }
 }

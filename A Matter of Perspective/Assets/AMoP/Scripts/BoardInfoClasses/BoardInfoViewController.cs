@@ -8,6 +8,9 @@ public class BoardInfoViewController : MonoBehaviour
     private NodeButtonPanelViewController nodeButtonController;
 
     [SerializeField]
+    private CanvasGroup boardInfoTextCanvasGroup;
+
+    [SerializeField]
     private RectTransform boardInfoTextPanel;
 
     [SerializeField]
@@ -24,19 +27,27 @@ public class BoardInfoViewController : MonoBehaviour
     public void SetText(string text)
     {
         boardInfoText.text = text;
+        boardInfoTextCanvasGroup.Show();
     }
 
-    public void Highlight(int x, int y, Color color)
+    public void UnsetText()
+    {
+        boardInfoText.text = "";
+        boardInfoTextCanvasGroup.Hide();
+    }
+
+    public BoardInfoHighlighter Highlight(int x, int y, Color color)
     {
         var button = nodeButtonController.GetButton(x, y);
         var highlighter = createHighlighter();
         highlighter.Init(button);
         highlighter.SetColor(color);
+        return highlighter;
     }
 
-    public void Highlight(int x, int y)
+    public BoardInfoHighlighter Highlight(int x, int y)
     {
-        Highlight(x, y, Color.green);
+        return Highlight(x, y, Color.green);
     }
 
     private BoardInfoHighlighter createHighlighter()

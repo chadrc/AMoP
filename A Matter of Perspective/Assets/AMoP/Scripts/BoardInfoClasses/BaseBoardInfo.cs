@@ -20,11 +20,19 @@ public abstract class BaseBoardInfo : MonoBehaviour
                 Debug.LogError("No BoardInfoViewController attached to BoardInfoTools object.");
             }
         }
+
+        LevelBehavior.GameEnd += onGameEnd;
 	}
 
     private void Start ()
     {
         StartCoroutine(setupRoutine());
+    }
+
+    private void onGameEnd()
+    {
+        destroy();
+        LevelBehavior.GameEnd -= onGameEnd;
     }
 
     private IEnumerator setupRoutine()
@@ -35,5 +43,6 @@ public abstract class BaseBoardInfo : MonoBehaviour
         setup();
     }
 
+    protected abstract void destroy();
     protected abstract void setup();
 }

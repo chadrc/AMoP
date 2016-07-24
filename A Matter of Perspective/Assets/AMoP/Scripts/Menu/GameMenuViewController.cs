@@ -36,6 +36,7 @@ public class GameMenuViewController : MonoBehaviour
         pausePanel.Hide();
 
         LevelBehavior.GameStart += onGameStart;
+        LevelBehavior.GameEnd += onGameEnd;
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
     }
 
@@ -80,11 +81,18 @@ public class GameMenuViewController : MonoBehaviour
         nodesText.text = captureCount + "/" + totalNodes;
     }
 
+    private void onGameEnd()
+    {
+        inGamePanel.Hide();
+    }
+
     private void onGameStart()
     {
         canvasGroup.Show();
         inGamePanel.Show();
         pausePanel.Hide();
+
+        captureCount = 0;
 
         var board = LevelBehavior.Current.CurrentBoard;
         totalNodes = board.CapturableNodeCount;
