@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class BoardInfoViewController : MonoBehaviour
@@ -7,7 +8,23 @@ public class BoardInfoViewController : MonoBehaviour
     private NodeButtonPanelViewController nodeButtonController;
 
     [SerializeField]
+    private RectTransform boardInfoTextPanel;
+
+    [SerializeField]
+    private Text boardInfoText;
+
+    [SerializeField]
     private GameObject highlighterPrefab;
+
+    void Awake()
+    {
+        ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
+    }
+
+    public void SetText(string text)
+    {
+        boardInfoText.text = text;
+    }
 
     public void Highlight(int x, int y, Color color)
     {
@@ -28,5 +45,19 @@ public class BoardInfoViewController : MonoBehaviour
         obj.transform.SetParent(transform);
         obj.transform.localScale = Vector3.one;
         return obj.GetComponent<BoardInfoHighlighter>();
+    }
+
+    private void onScreenChanged(int width, int height)
+    {
+        if (width > height)
+        {
+            boardInfoTextPanel.anchorMin = new Vector2(.8f, 0);
+            boardInfoTextPanel.anchorMax = new Vector2(1, .75f);
+        }
+        else
+        {
+            boardInfoTextPanel.anchorMin = new Vector2(.25f, 0);
+            boardInfoTextPanel.anchorMax = new Vector2(1, .2f);
+        }
     }
 }
