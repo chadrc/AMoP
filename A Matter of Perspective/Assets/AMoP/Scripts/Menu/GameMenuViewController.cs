@@ -24,6 +24,7 @@ public class GameMenuViewController : MonoBehaviour
     {
         canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.Hide();
+        pausePanel.Hide();
 
         LevelBehavior.GameStart += onGameStart;
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;

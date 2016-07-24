@@ -24,6 +24,7 @@ public class MenuViewController : MonoBehaviour
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        Show();
         LevelBehavior.GameEnd += OnGameEnd;
         ScreenChangeListeningBehavior.ScreenChanged += onScreenChanged;
     }
