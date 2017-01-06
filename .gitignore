@@ -3,3 +3,6 @@ Temp/
 *.sln
 *.csproj
 Asset Files/
+*.idea/
+A Matter of Perspective/Assets/Plugins/Editor/JetBrains/*
+A Matter of Perspective/Assets/Plugins/Editor/JetBrains.meta
