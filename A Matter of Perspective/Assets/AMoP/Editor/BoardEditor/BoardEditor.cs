@@ -13,8 +13,8 @@ public class BoardEditor : EditorWindow
 	private static bool _showLegend;
 
     private BoardData _boardData;
-    private GameObject _boardParent;
-    private bool _showNodeList;
+    private bool _showSeriesList;
+    private Dictionary<BoardSeries, bool> _showSeriesBools = new Dictionary<BoardSeries, bool>();
     private readonly List<BoardData> _boardDatas = new List<BoardData>();
     private List<BoardSeries> _boardSeries = new List<BoardSeries>();
     private BoardEditorTabState _tabState = BoardEditorTabState.Nodes;
@@ -73,28 +73,88 @@ public class BoardEditor : EditorWindow
                 LoadBoardDatas();
             }
 
-            _boardScrollPos = EditorGUILayout.BeginScrollView(_boardScrollPos);
-            foreach(var data in _boardDatas)
+            EditorGUILayout.BeginHorizontal();
+            var originalClr = GUI.backgroundColor;
+
+            GUI.backgroundColor = !_showSeriesList ? _highlightClr : originalClr;
+            var pressed = !_showSeriesList ? GUILayout.Button("All Boards", _whiteText) : GUILayout.Button("All Boards");
+            if (pressed)
             {
-                EditorGUILayout.BeginHorizontal();
-
-                EditorGUILayout.LabelField(data.name);
-                if (GUILayout.Button("Load")) {
-                    LoadBoard(data);
-                }
-
-                var oldClr = GUI.backgroundColor;
-                GUI.backgroundColor = Color.red;
-                if (GUILayout.Button("X", GUILayout.Width(20f)))
-                {
-                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(data));
-                    LoadBoardDatas();
-                    return;
-                }
-                GUI.backgroundColor = oldClr;
-                EditorGUILayout.EndHorizontal();
+                _showSeriesList = false;
             }
-            EditorGUILayout.EndScrollView();
+            GUI.backgroundColor = originalClr;
+
+            GUI.backgroundColor = _showSeriesList ? _highlightClr : originalClr;
+            pressed = _showSeriesList ? GUILayout.Button("Series", _whiteText) : GUILayout.Button("Series");
+            if (pressed)
+            {
+                _showSeriesList = true;
+            }
+            GUI.backgroundColor = originalClr;
+            EditorGUILayout.EndHorizontal();
+
+            if (_showSeriesList)
+            {
+                _boardScrollPos = EditorGUILayout.BeginScrollView(_boardScrollPos);
+                foreach (var series in _boardSeries)
+                {
+                    if (!_showSeriesBools.ContainsKey(series))
+                    {
+                        _showSeriesBools.Add(series, false);
+                    }
+
+                    _showSeriesBools[series] = EditorGUILayout.Foldout(_showSeriesBools[series], series.DisplayName);
+                    if (!_showSeriesBools[series]) continue;
+                    foreach(var board in series)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.BeginHorizontal();
+
+                        EditorGUILayout.LabelField(board.name);
+                        if (GUILayout.Button("Load")) {
+                            LoadBoard(board);
+                        }
+
+                        var oldClr = GUI.backgroundColor;
+                        GUI.backgroundColor = Color.red;
+                        if (GUILayout.Button("X", GUILayout.Width(20f)))
+                        {
+                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(board));
+                            LoadBoardDatas();
+                            return;
+                        }
+                        GUI.backgroundColor = oldClr;
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUI.indentLevel--;
+                    }
+                }
+                EditorGUILayout.EndScrollView();
+            }
+            else
+            {
+                _boardScrollPos = EditorGUILayout.BeginScrollView(_boardScrollPos);
+                foreach(var data in _boardDatas)
+                {
+                    EditorGUILayout.BeginHorizontal();
+
+                    EditorGUILayout.LabelField(data.name);
+                    if (GUILayout.Button("Load")) {
+                        LoadBoard(data);
+                    }
+
+                    var oldClr = GUI.backgroundColor;
+                    GUI.backgroundColor = Color.red;
+                    if (GUILayout.Button("X", GUILayout.Width(20f)))
+                    {
+                        AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(data));
+                        LoadBoardDatas();
+                        return;
+                    }
+                    GUI.backgroundColor = oldClr;
+                    EditorGUILayout.EndHorizontal();
+                }
+                EditorGUILayout.EndScrollView();
+            }
         }
         else
         {
