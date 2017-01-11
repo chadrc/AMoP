@@ -5,24 +5,25 @@ using System;
 
 public class BoardEditor : EditorWindow
 {
-	private const float boardRotateControlWidth = 112f;
-	private const float boardRotateControlHeight = 112f;
+	private const float BoardRotateControlWidth = 112f;
+	private const float BoardRotateControlHeight = 112f;
 
-	private const float legendItemWidth = 80f;
-	private const float legendItemHeight = 20f;
-	private static bool showLegend;
+	private const float LegendItemWidth = 80f;
+	private const float LegendItemHeight = 20f;
+	private static bool _showLegend;
 
-    private BoardData boardData;
-    private GameObject boardParent;
-    private bool showNodeList;
-    private List<BoardData> boardDatas = new List<BoardData>();
-    private BoardEditorTabState tabState = BoardEditorTabState.Nodes;
-    private Color highlightClr = new Color(.3f, .3f, .3f);
-    private GUIStyle whiteText;
-    private Vector2 boardScrollPos;
-    private Vector2 nodeScrollPos;
-	private List<EditorBoardNodeBehavior> editNodes;
-	private bool sceneOrtho;
+    private BoardData _boardData;
+    private GameObject _boardParent;
+    private bool _showNodeList;
+    private readonly List<BoardData> _boardDatas = new List<BoardData>();
+    private List<BoardSeries> _boardSeries = new List<BoardSeries>();
+    private BoardEditorTabState _tabState = BoardEditorTabState.Nodes;
+    private readonly Color _highlightClr = new Color(.3f, .3f, .3f);
+    private GUIStyle _whiteText;
+    private Vector2 _boardScrollPos;
+    private Vector2 _nodeScrollPos;
+	private List<EditorBoardNodeBehavior> _editNodes;
+	private bool _sceneOrtho;
 
     private enum BoardEditorTabState
     {
@@ -32,55 +33,54 @@ public class BoardEditor : EditorWindow
     }
     
     [MenuItem("AMoP/Board Editor")]
-    static void Init()
+    private static void Init()
     {
         var window = (BoardEditor)EditorWindow.GetWindow(typeof(BoardEditor));
 		window.name = "Board Editor";
         window.Show();
     }
 
-    void OnFocus()
+    private void OnFocus()
 	{
-        SceneView.onSceneGUIDelegate += onSceneGUI;
-        loadBoardDatas();
-        setupListeners();
+        SceneView.onSceneGUIDelegate += OnSceneGui;
+        LoadBoardDatas();
+        SetupListeners();
 
         //checkSceneCam();
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-		unloadBoard ();
+		UnloadBoard ();
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
-		setupListeners ();
+		SetupListeners ();
 
         // Can only call GUI functions from inside OnGUI
-        whiteText = new GUIStyle(GUI.skin.button);
-        whiteText.normal.textColor = new Color(.9f, .9f, .9f);
+        _whiteText = new GUIStyle(GUI.skin.button) {normal = {textColor = new Color(.9f, .9f, .9f)}};
 
-        if (boardData == null)
+        if (_boardData == null)
         {
             if (GUILayout.Button("Create"))
             {
-                createBoard();
+                CreateBoard();
             }
 
-            if (boardDatas == null)
+            if (_boardDatas == null)
             {
-                loadBoardDatas();
+                LoadBoardDatas();
             }
 
-            boardScrollPos = EditorGUILayout.BeginScrollView(boardScrollPos);
-            foreach(var data in boardDatas)
+            _boardScrollPos = EditorGUILayout.BeginScrollView(_boardScrollPos);
+            foreach(var data in _boardDatas)
             {
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUILayout.LabelField(data.name);
                 if (GUILayout.Button("Load")) {
-                    loadBoard(data);
+                    LoadBoard(data);
                 }
 
                 var oldClr = GUI.backgroundColor;
@@ -88,7 +88,7 @@ public class BoardEditor : EditorWindow
                 if (GUILayout.Button("X", GUILayout.Width(20f)))
                 {
                     AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(data));
-                    loadBoardDatas();
+                    LoadBoardDatas();
                     return;
                 }
                 GUI.backgroundColor = oldClr;
@@ -98,39 +98,39 @@ public class BoardEditor : EditorWindow
         }
         else
         {
-            checkSceneCam();
+            CheckSceneCam();
 
             if (GUILayout.Button("Unload Board"))
             {
-                unloadBoard();
+                UnloadBoard();
                 return;
             }
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            EditorGUILayout.PrefixLabel(boardData.name);
+            EditorGUILayout.PrefixLabel(_boardData.name);
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
-            boardData.BoardSize = EditorGUILayout.IntSlider("Board Size: ", boardData.BoardSize, 3, 6);
+            _boardData.BoardSize = EditorGUILayout.IntSlider("Board Size: ", _boardData.BoardSize, 3, 6);
 
             var originalClr = GUI.backgroundColor;
             EditorGUILayout.BeginHorizontal();
 
             foreach (var e in (BoardEditorTabState[])Enum.GetValues(typeof(BoardEditorTabState)))
             {
-                GUI.backgroundColor = e == tabState ? highlightClr : originalClr;
-                bool pressed = e == tabState ? GUILayout.Button(e.ToString(), whiteText) : GUILayout.Button(e.ToString());
+                GUI.backgroundColor = e == _tabState ? _highlightClr : originalClr;
+                var pressed = e == _tabState ? GUILayout.Button(e.ToString(), _whiteText) : GUILayout.Button(e.ToString());
                 if (pressed)
                 {
-                    tabState = e;
+                    _tabState = e;
                 }
                 GUI.backgroundColor = originalClr;
             }
 
             EditorGUILayout.EndHorizontal();
 
-            switch (tabState)
+            switch (_tabState)
             {
                 case BoardEditorTabState.Nodes:
                     NodeTabState();
@@ -143,6 +143,9 @@ public class BoardEditor : EditorWindow
                 case BoardEditorTabState.Actions:
                     ActionsTabState();
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
@@ -151,50 +154,48 @@ public class BoardEditor : EditorWindow
     {
         if (GUILayout.Button("Add Node"))
         {
-            addNewNode();
+            AddNewNode();
         }
 
         AMoPEditorUtils.EditBoardNodeDataHeader();
 
         BoardNodeData deleteNode = null;
 
-        int index = 0;
-        nodeScrollPos = EditorGUILayout.BeginScrollView(nodeScrollPos);
-        foreach (var node in boardData.Nodes)
+        var index = 0;
+        _nodeScrollPos = EditorGUILayout.BeginScrollView(_nodeScrollPos);
+        foreach (var node in _boardData.Nodes)
         {
-            if (AMoPEditorUtils.EditBoardNodeData(index.ToString("000") + ": ", node, boardData.BoardSize))
+            if (AMoPEditorUtils.EditBoardNodeData(index.ToString("000") + ": ", node, _boardData.BoardSize))
             {
                 deleteNode = node;
             }
 
-			bool deleted = deleteNode == node;
-            if (GUI.changed && index < editNodes.Count)
+			var deleted = deleteNode == node;
+            if (GUI.changed && index < _editNodes.Count)
             {
-                editNodes[index].InspectorEdited(deleted);
+                _editNodes[index].InspectorEdited(deleted);
             }
 
             index++;
         }
         EditorGUILayout.EndScrollView();
 
-        if (deleteNode != null)
-        {
-            Debug.Log("Deleting Node");
-            boardData.RemoveNode(deleteNode);
-            reloadScene();
-        }
+        if (deleteNode == null) return;
+        Debug.Log("Deleting Node");
+        _boardData.RemoveNode(deleteNode);
+        ReloadScene();
     }
 
     private void StatsTabState()
     {
-        boardData.InfoClassName = EditorGUILayout.TextField("Info Class Name:", boardData.InfoClassName);
+        _boardData.InfoClassName = EditorGUILayout.TextField("Info Class Name:", _boardData.InfoClassName);
 
         EditorGUILayout.LabelField("Scores");
 
-        foreach (var pair in boardData.Scores)
+        foreach (var pair in _boardData.Scores)
         {
-            int score = EditorGUILayout.IntField(pair.Key.ToString(), pair.Value);
-            boardData.Scores.SetScore(pair.Key, score);
+            var score = EditorGUILayout.IntField(pair.Key.ToString(), pair.Value);
+            _boardData.Scores.SetScore(pair.Key, score);
         }
     }
 
@@ -203,117 +204,115 @@ public class BoardEditor : EditorWindow
 
     }
 
-    void OnProjectChanged()
+    private void OnProjectChanged()
     {
-        loadBoardDatas();
+        LoadBoardDatas();
     }
 
-    private void onSceneGUI(SceneView scene)
+    private void OnSceneGui(SceneView scene)
 	{
-        setupListeners();
-        checkSceneCam();
+        SetupListeners();
+        CheckSceneCam();
 
-        if (boardData != null)
-        {
-            drawLegend();
-            drawBoardRotator();
-        }
-    }
+	    if (_boardData == null) return;
+	    DrawLegend();
+	    DrawBoardRotator();
+	}
 
-	private void checkSceneCam()
+	private void CheckSceneCam()
 	{
 		var allCams = SceneView.GetAllSceneCameras ();
-		if (allCams.Length > 0)
-		{
-			if (sceneOrtho != allCams [0].orthographic)
-			{
-				sceneOrtho = allCams [0].orthographic;
-				hideShowNodes ();
-			}
-		}
+	    if (allCams.Length <= 0) return;
+	    if (_sceneOrtho == allCams[0].orthographic) return;
+	    _sceneOrtho = allCams [0].orthographic;
+	    HideShowNodes ();
 	}
 
-	private void setupListeners()
-    {
-        EditorBoardNodeBehavior.GetBoardNodeData -= editNodeGetDataDelegate;
-        EditorBoardNodeBehavior.Edited -= onNodeEdited;
+	private void SetupListeners()
+	{
+	    EditorBoardNodeBehavior.GetBoardNodeData = null;
+        EditorBoardNodeBehavior.Edited -= OnNodeEdited;
 
-        EditorBoardNodeBehavior.GetBoardNodeData += editNodeGetDataDelegate;
-		EditorBoardNodeBehavior.Edited += onNodeEdited;
+        EditorBoardNodeBehavior.GetBoardNodeData += EditNodeGetDataDelegate;
+		EditorBoardNodeBehavior.Edited += OnNodeEdited;
 	}
 
-    private void loadBoardDatas()
+    private void LoadBoardDatas()
     {
-        boardDatas.Clear();
+        _boardDatas.Clear();
+        _boardSeries.Clear();
 
         var boardAssets = AssetDatabase.FindAssets("t:BoardData");
+        var boardSeries = AssetDatabase.FindAssets("t:BoardSeries");
 
-        foreach (var boardGUID in boardAssets)
+        foreach (var guid in boardAssets)
         {
-            var assetPath = AssetDatabase.GUIDToAssetPath(boardGUID);
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var asset = AssetDatabase.LoadAssetAtPath<BoardData>(assetPath);
-            boardDatas.Add(asset);
+            _boardDatas.Add(asset);
+        }
+
+        foreach (var guid in boardSeries)
+        {
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var asset = AssetDatabase.LoadAssetAtPath<BoardSeries>(assetPath);
+            _boardSeries.Add(asset);
         }
     }
 
-    private void createBoard()
+    private void CreateBoard()
     {
-        boardData = AMoPMenuItem.CreateBoardData();
-        loadBoardDatas();
+        _boardData = AMoPMenuItem.CreateBoardData();
+        LoadBoardDatas();
     }
 
-    private void loadBoard(BoardData data)
+    private void LoadBoard(BoardData data)
     {
-        boardData = data;
-        createSceneBoard();
+        _boardData = data;
+        CreateSceneBoard();
     }
 
-    private void unloadBoard()
+    private void UnloadBoard()
     {
-        boardData = null;
+        _boardData = null;
         destorySceneBoard();
     }
 
-    private void reloadScene()
+    private void ReloadScene()
     {
         destorySceneBoard();
-        createSceneBoard();
+        CreateSceneBoard();
     }
 
-    private void createSceneBoard()
+    private void CreateSceneBoard()
     {
 		var boardParent = GameObject.Find("BoardParent");
 		boardParent.transform.rotation = Quaternion.identity;
-        if (boardParent == null)
-        {
-            Debug.Log("Creating board parent.");
-            boardParent = new GameObject("BoardParent");
-        }
 
-        editNodes = new List<EditorBoardNodeBehavior> ();
-        var nodes = boardData.Nodes;
+        _editNodes = new List<EditorBoardNodeBehavior> ();
+        var nodes = _boardData.Nodes;
         // Create edit nodes
         for (int i=0; i<nodes.Count; i++)
         {
             var obj = new GameObject();
             obj.transform.SetParent(boardParent.transform);
             var editNode = obj.AddComponent<EditorBoardNodeBehavior>();
-			editNodes.Add (editNode);
-			editNode.SetData (i, boardData);
+			_editNodes.Add (editNode);
+			editNode.SetData (i, _boardData);
         }
 
-		hideShowNodes ();
+		HideShowNodes ();
 
-        setupListeners();
+        SetupListeners();
     }
 
-	private void showAllNodes()
+	private void ShowAllNodes()
 	{
-		for (int x = 0; x < boardData.BoardSize; x++)
+		for (var x = 0; x < _boardData.BoardSize; x++)
 		{
-			for (int y = 0; y < boardData.BoardSize; y++)
+			for (var y = 0; y < _boardData.BoardSize; y++)
 			{
-                var row = AMoPUtils.GetEditNodeRow(editNodes, x - boardData.OffsetValue, y - boardData.OffsetValue);
+                var row = AMoPUtils.GetEditNodeRow(_editNodes, x - _boardData.OffsetValue, y - _boardData.OffsetValue);
 				row.Closest.Show ();
 				foreach (var h in row.Hidden)
 				{
@@ -323,25 +322,25 @@ public class BoardEditor : EditorWindow
 		}
 	}
 
-	private void hideShowNodes()
+	private void HideShowNodes()
 	{
-		if (editNodes == null)
+		if (_editNodes == null)
 		{
 			return;
 		}
 
-		for (int x = 0; x < boardData.BoardSize; x++)
+		for (var x = 0; x < _boardData.BoardSize; x++)
 		{
-			for (int y = 0; y < boardData.BoardSize; y++)
+			for (var y = 0; y < _boardData.BoardSize; y++)
 			{
-                var row = AMoPUtils.GetEditNodeRow(editNodes, x - boardData.OffsetValue, y - boardData.OffsetValue);
+                var row = AMoPUtils.GetEditNodeRow(_editNodes, x - _boardData.OffsetValue, y - _boardData.OffsetValue);
 				if (row.Closest != null)
 				{
 					row.Closest.Show ();
 				}
 				foreach (var h in row.Hidden)
 				{
-					if (sceneOrtho)
+					if (_sceneOrtho)
 					{
 						h.Hide ();
 					}
@@ -354,7 +353,7 @@ public class BoardEditor : EditorWindow
 		}
 	}
 
-    private void destorySceneBoard()
+    private static void destorySceneBoard()
     {
         var boardParent = GameObject.Find("BoardParent");
         var destoryList = new List<GameObject>();
@@ -374,50 +373,50 @@ public class BoardEditor : EditorWindow
 		boardParent.transform.rotation = Quaternion.identity;
     }
 
-    private void addNewNode()
+    private void AddNewNode()
     {
-        boardData.AddNode();
-        reloadScene();
+        _boardData.AddNode();
+        ReloadScene();
     }
 
-	private BoardNodeData editNodeGetDataDelegate(int index)
+	private BoardNodeData EditNodeGetDataDelegate(int index)
 	{
-		if (boardData != null && index >= 0 && index < boardData.Nodes.Count)
+		if (_boardData != null && index >= 0 && index < _boardData.Nodes.Count)
 		{
-			return boardData.Nodes [index];
+			return _boardData.Nodes [index];
 		}
 		return null;
 	}
 
-	private void onNodeEdited(EditorBoardNodeBehavior editNode, bool delete)
+	private void OnNodeEdited(EditorBoardNodeBehavior editNode, bool delete)
 	{
 		if (delete)
 		{
-			boardData.RemoveNode (editNode.NodeIndex);
-			editNodes.Remove (editNode);
+			_boardData.RemoveNode (editNode.NodeIndex);
+			_editNodes.Remove (editNode);
 			GameObject.DestroyImmediate (editNode.gameObject);
 
 			int index = 0;
-			for (int i=0; i<editNodes.Count; i++)
+			for (int i=0; i<_editNodes.Count; i++)
 			{
-				editNodes [index].SetData (index, boardData);
+				_editNodes [index].SetData (index, _boardData);
 			}
 		}
 
-		hideShowNodes ();
+		HideShowNodes ();
 		EditorUtility.SetDirty (this);
 	}
 
 
-	private void drawBoardRotator()
+	private void DrawBoardRotator()
 	{
         //var sceneViewRect = EditorWindow.GetWindow<SceneView>().camera.pixelRect;
         var sceneViewRect = Camera.current.pixelRect;
         var controlRect = new Rect(
-            sceneViewRect.width - boardRotateControlWidth,
-            sceneViewRect.height - boardRotateControlHeight,
-            boardRotateControlWidth,
-            boardRotateControlHeight);
+            sceneViewRect.width - BoardRotateControlWidth,
+            sceneViewRect.height - BoardRotateControlHeight,
+            BoardRotateControlWidth,
+            BoardRotateControlHeight);
 
         var backClr = new Color(1f, 1f, 1f, .5f);
         var style = new GUIStyle();
@@ -438,7 +437,7 @@ public class BoardEditor : EditorWindow
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Up", GUILayout.Width(50f)))
         {
-            rotateBoardParent(Vector2.up);
+            RotateBoardParent(Vector2.up);
         }
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();
@@ -446,12 +445,12 @@ public class BoardEditor : EditorWindow
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Right", GUILayout.Width(50f)))
         {
-            rotateBoardParent(Vector2.right);
+            RotateBoardParent(Vector2.right);
         }
 
         if (GUILayout.Button("Left", GUILayout.Width(50f)))
         {
-            rotateBoardParent(Vector2.left);
+            RotateBoardParent(Vector2.left);
         }
         EditorGUILayout.EndHorizontal();
 
@@ -459,7 +458,7 @@ public class BoardEditor : EditorWindow
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Down", GUILayout.Width(50f)))
         {
-            rotateBoardParent(Vector2.down);
+            RotateBoardParent(Vector2.down);
         }
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();
@@ -471,37 +470,39 @@ public class BoardEditor : EditorWindow
         GUILayout.EndArea();
     }
 
-	private void drawLegend()
+	private static void DrawLegend()
 	{
         var typeArray = (BoardNodeType[])Enum.GetValues(typeof(BoardNodeType));
-        float legendHeight = typeArray.Length * legendItemHeight;
+        var legendHeight = typeArray.Length * LegendItemHeight;
 
-        GUILayout.BeginArea(new Rect(0, 0, legendItemWidth + 20f, legendHeight + 70f));
+        GUILayout.BeginArea(new Rect(0, 0, LegendItemWidth + 20f, legendHeight + 70f));
 
-        if (showLegend)
+        if (_showLegend)
         {
-            if (GUILayout.Button("Hide Legend", GUILayout.Width(legendItemWidth)))
+            if (GUILayout.Button("Hide Legend", GUILayout.Width(LegendItemWidth)))
             {
-                showLegend = false;
+                _showLegend = false;
                 return;
             }
 
             var backClr = new Color(1f, 1f, 1f, .5f);
-            var style = new GUIStyle();
-            style.normal.background = AMoPEditorUtils.MakeTex((int)legendItemWidth, (int)legendHeight, backClr);
-            GUILayout.BeginVertical(style, GUILayout.Width(legendItemWidth), GUILayout.Height(legendHeight + 20f));
+            var style = new GUIStyle
+            {
+                normal = {background = AMoPEditorUtils.MakeTex((int) LegendItemWidth, (int) legendHeight, backClr)}
+            };
+            GUILayout.BeginVertical(style, GUILayout.Width(LegendItemWidth), GUILayout.Height(legendHeight + 20f));
             foreach (var type in typeArray)
             {
-                Texture2D texture = new Texture2D(1, 1);
+                var texture = new Texture2D(1, 1);
                 texture.SetPixel(0, 0, EditorBoardNodeBehavior.TypeColorMap[type]);
                 texture.Apply();
                 var oldBackground = GUI.skin.box.normal.background;
                 GUI.skin.box.normal.background = texture;
 
-                GUILayout.BeginHorizontal(GUILayout.Width(legendItemWidth));
+                GUILayout.BeginHorizontal(GUILayout.Width(LegendItemWidth));
 
-                GUILayout.Label(type.ToString() + " -> ", GUILayout.Width(legendItemWidth - legendItemHeight));
-                GUILayout.Box(GUIContent.none, GUILayout.Width(legendItemHeight));
+                GUILayout.Label(type.ToString() + " -> ", GUILayout.Width(LegendItemWidth - LegendItemHeight));
+                GUILayout.Box(GUIContent.none, GUILayout.Width(LegendItemHeight));
 
                 GUILayout.EndHorizontal();
 
@@ -512,16 +513,16 @@ public class BoardEditor : EditorWindow
         }
         else
         {
-            if (GUILayout.Button("Show Legend", GUILayout.Width(legendItemWidth)))
+            if (GUILayout.Button("Show Legend", GUILayout.Width(LegendItemWidth)))
             {
-                showLegend = true;
+                _showLegend = true;
             }
         }
 
         GUILayout.EndArea();
     }
 
-    private void rotateBoardParent(Vector2 dir)
+    private void RotateBoardParent(Vector2 dir)
 	{
 		var boardParent = GameObject.Find ("BoardParent");
 		if (boardParent == null)
@@ -529,9 +530,12 @@ public class BoardEditor : EditorWindow
 			Debug.LogError ("No object named BoardParent to rotate.");
 		}
 
-		boardParent.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
-		boardParent.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
+	    if (boardParent != null)
+	    {
+	        boardParent.transform.Rotate(Vector3.up, 90f * -dir.x, Space.World);
+	        boardParent.transform.Rotate(Vector3.right, 90f * dir.y, Space.World);
+	    }
 
-		hideShowNodes ();
+	    HideShowNodes ();
 	}
 }
