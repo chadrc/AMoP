@@ -92,14 +92,8 @@ public class LevelBehavior : MonoBehaviour
 
     public virtual void StartGame()
     {
-        GameTime = 0;
-        BoardTurnCount = 0;
-        EnergyTransferCount = 0;
-        Time.timeScale = 1.0f;
-        EnergyPoolManager.HideAllEnergy();
-        DestroyBoard();
+        ResetState();
 
-        GameTime = 0;
         var boardSeries = GameData.SeriesList.GetSeries(_boardSeriesIndex);
         if (boardSeries == null)
         {
@@ -113,6 +107,23 @@ public class LevelBehavior : MonoBehaviour
             return;
         }
 
+        SetUpBoard(boardData);
+        DoStartGame();
+        InitializeBoardInfoClass(boardData);
+    }
+
+    protected void ResetState()
+    {
+        GameTime = 0;
+        BoardTurnCount = 0;
+        EnergyTransferCount = 0;
+        Time.timeScale = 1.0f;
+        EnergyPoolManager.HideAllEnergy();
+        DestroyBoard();
+    }
+
+    protected void SetUpBoard(BoardData boardData)
+    {
         Scores = boardData.Scores;
         CurrentBoard = new Board(boardData, _boardBehavior, _boardNodeFactory);
         CurrentBoard.Behavior.Init(CurrentBoard);
@@ -123,13 +134,15 @@ public class LevelBehavior : MonoBehaviour
         }
 
         _buttonController.Init(CurrentBoard);
+    }
 
+    protected void DoStartGame()
+    {
         _playing = true;
         if (GameStart != null)
         {
             GameStart();
         }
-
     }
 
     protected void InitializeBoardInfoClass(BoardData boardData)
