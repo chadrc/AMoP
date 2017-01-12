@@ -3,7 +3,6 @@ using UnityEditor;
 using System.Collections.Generic;
 using System;
 
-[InitializeOnLoad]
 public class BoardEditor : EditorWindow
 {
 	private const float BoardRotateControlWidth = 112f;
@@ -12,7 +11,6 @@ public class BoardEditor : EditorWindow
 	private const float LegendItemWidth = 80f;
 	private const float LegendItemHeight = 20f;
 	private static bool _showLegend;
-    private static bool _isPlaying = false;
 
     private BoardData _boardData;
     private BoardData _storedData;
@@ -34,11 +32,6 @@ public class BoardEditor : EditorWindow
         Stats,
         Actions
     }
-
-    static BoardEditor()
-    {
-        EditorApplication.playmodeStateChanged += OnPlayModeStateChanged;
-    }
     
     [MenuItem("AMoP/Board Editor")]
     private static void Init()
@@ -59,7 +52,7 @@ public class BoardEditor : EditorWindow
 
     private void OnDestroy()
     {
-		UnloadBoard ();
+        UnloadBoard ();
     }
 
     private void OnGUI()
@@ -271,27 +264,7 @@ public class BoardEditor : EditorWindow
     {
         if (GUILayout.Button("Test"))
         {
-            _storedData = _boardData;
-            _boardData = null;
             EditorApplication.isPlaying = true;
-        }
-    }
-
-    private static void OnPlayModeStateChanged()
-    {
-        if (EditorApplication.isPlaying)
-        {
-            if (!_isPlaying)
-            {
-                _isPlaying = true;
-            }
-        }
-        else
-        {
-            if (_isPlaying)
-            {
-                _isPlaying = false;
-            }
         }
     }
 
