@@ -4,29 +4,29 @@ using System;
 public class LevelBehavior : MonoBehaviour
 {
     public static LevelBehavior Current { get; private set; }
-    public static event System.Action GameStart;
-    public static event System.Action GameEnd;
+    public static event Action GameStart;
+    public static event Action GameEnd;
 
     [SerializeField]
-    private BoardBehavior boardBehavior;
+    private BoardBehavior _boardBehavior;
 
     [SerializeField]
-    private int boardSeriesIndex;
+    private int _boardSeriesIndex;
 
     [SerializeField]
-    private int startingBoardIndex;
+    private int _startingBoardIndex;
 
     [SerializeField]
-    private BoardNodeFactory boardNodeFactory;
+    private BoardNodeFactory _boardNodeFactory;
 
     [SerializeField]
-    private EnergyFactory energyFactory;
+    private EnergyFactory _energyFactory;
 
     [SerializeField]
-    private NodeButtonPanelViewController buttonController;
+    private NodeButtonPanelViewController _buttonController;
     
-    private NodeButtonBehavior downButton;
-    private bool playing = false;
+    private NodeButtonBehavior _downButton;
+    private bool _playing;
 
     public BoardScores Scores { get; private set; }
     public Board CurrentBoard { get; private set; }
@@ -35,34 +35,31 @@ public class LevelBehavior : MonoBehaviour
     {
         get
         {
-            var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
-            return startingBoardIndex+1 < boardSeries.Count;
+            var boardSeries = GameData.SeriesList.GetSeries(_boardSeriesIndex);
+            return _startingBoardIndex+1 < boardSeries.Count;
         }
     }
-    public bool HasNextSeries { get { return boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
+    public bool HasNextSeries { get { return _boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
 
     // Score metrics
     public float GameTime { get; private set; }
     public int BoardTurnCount { get; private set; }
     public int EnergyTransferCount { get; private set; }
-    public int Score { get { return Mathf.RoundToInt(( gameTimeScore + boardTurnScore + energyTransferScore) * GameData.Constants.ScoreMultiplier); } }
+    public int Score { get { return Mathf.RoundToInt(( GameTimeScore + BoardTurnScore + EnergyTransferScore) * GameData.Constants.ScoreMultiplier); } }
 
-    private float gameTimeScore
+    private float GameTimeScore
     {
         get
         {
-            if (GameTime == 0)
+            if (Mathf.Approximately(GameTime, 0))
             {
                 return 0;
             }
-            else
-            {
-                return GameData.Constants.GameTimeWeight / GameTime;
-            }
+            return GameData.Constants.GameTimeWeight / GameTime;
         }
     }
 
-    private float boardTurnScore
+    private float BoardTurnScore
     {
         get
         {
@@ -70,14 +67,11 @@ public class LevelBehavior : MonoBehaviour
             {
                 return 0;
             }
-            else
-            {
-                return GameData.Constants.BoardTurnsWeight / BoardTurnCount;
-            }
+            return GameData.Constants.BoardTurnsWeight / BoardTurnCount;
         }
     }
 
-    private float energyTransferScore
+    private float EnergyTransferScore
     {
         get
         {
@@ -85,21 +79,18 @@ public class LevelBehavior : MonoBehaviour
             {
                 return 0;
             }
-            else
-            {
-                return GameData.Constants.EnergyTransfersWeight / EnergyTransferCount;
-            }
+            return GameData.Constants.EnergyTransfersWeight / EnergyTransferCount;
         }
     }
 
     public void StartGame(int seriesIndex, int boardIndex)
     {
-        boardSeriesIndex = seriesIndex;
-        startingBoardIndex = boardIndex;
+        _boardSeriesIndex = seriesIndex;
+        _startingBoardIndex = boardIndex;
         StartGame();
     }
 
-    public void StartGame()
+    public virtual void StartGame()
     {
         GameTime = 0;
         BoardTurnCount = 0;
@@ -109,21 +100,21 @@ public class LevelBehavior : MonoBehaviour
         DestroyBoard();
 
         GameTime = 0;
-        var boardSeries = GameData.SeriesList.GetSeries(boardSeriesIndex);
+        var boardSeries = GameData.SeriesList.GetSeries(_boardSeriesIndex);
         if (boardSeries == null)
         {
-            Debug.LogError("No series with index " + boardSeriesIndex);
+            Debug.LogError("No series with index " + _boardSeriesIndex);
             return;
         }
-        var boardData = boardSeries.GetBoard(startingBoardIndex);
+        var boardData = boardSeries.GetBoard(_startingBoardIndex);
         if (boardData == null)
         {
-            Debug.LogError("No board data in series " + boardSeriesIndex + " with index " + startingBoardIndex);
+            Debug.LogError("No board data in series " + _boardSeriesIndex + " with index " + _startingBoardIndex);
             return;
         }
 
         Scores = boardData.Scores;
-        CurrentBoard = new Board(boardData, boardBehavior, boardNodeFactory);
+        CurrentBoard = new Board(boardData, _boardBehavior, _boardNodeFactory);
         CurrentBoard.Behavior.Init(CurrentBoard);
         CurrentBoard.Behavior.SpinEnd += OnSpinEnd;
         foreach (var node in CurrentBoard)
@@ -131,29 +122,31 @@ public class LevelBehavior : MonoBehaviour
             node.Affiliation.Changed += OnNodeAffiliationChanged;
         }
 
-        buttonController.Init(CurrentBoard);
+        _buttonController.Init(CurrentBoard);
 
-        playing = true;
+        _playing = true;
         if (GameStart != null)
         {
             GameStart();
         }
 
-        if (boardData.InfoClassName != null && boardData.InfoClassName != "")
+    }
+
+    protected void InitializeBoardInfoClass(BoardData boardData)
+    {
+        if (string.IsNullOrEmpty(boardData.InfoClassName)) return;
+        try
         {
-            try
+            var type = Type.GetType(boardData.InfoClassName);
+            var obj = gameObject.AddComponent(type);
+            if (!(obj is BaseBoardInfo))
             {
-                Type type = Type.GetType(boardData.InfoClassName);
-                var obj = gameObject.AddComponent(type);
-                if (!(obj is BaseBoardInfo))
-                {
-                    Debug.LogWarning("Info script does not inherit BaseBoardInfo.");
-                }
+                Debug.LogWarning("Info script does not inherit BaseBoardInfo.");
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e);
-            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
         }
     }
 
@@ -161,12 +154,12 @@ public class LevelBehavior : MonoBehaviour
     {
         if (HasNextLevel)
         {
-            startingBoardIndex++;
+            _startingBoardIndex++;
         }
         else if (HasNextSeries)
         {
-            boardSeriesIndex++;
-            startingBoardIndex = 0;
+            _boardSeriesIndex++;
+            _startingBoardIndex = 0;
         }
         else
         {
@@ -193,7 +186,7 @@ public class LevelBehavior : MonoBehaviour
         CurrentBoard = null;
     }
 
-    void Awake()
+    private void Awake()
     {
         if (Current == null)
         {
@@ -205,17 +198,17 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
-    void Start()
+    private void Start()
     {
         // UI Events
-        EnergyPoolManager = new EnergyPoolManager(energyFactory);
-        buttonController.NodeSwipeOccurred += OnNodeSwipeOccurred;
-        buttonController.SwipeOccurred += OnSwipeOccurred;
+        EnergyPoolManager = new EnergyPoolManager(_energyFactory);
+        _buttonController.NodeSwipeOccurred += OnNodeSwipeOccurred;
+        _buttonController.SwipeOccurred += OnSwipeOccurred;
     }
 
-    void Update()
+    private void Update()
     {
-        if (playing)
+        if (_playing)
         {
             GameTime += Time.deltaTime;
         }
@@ -226,7 +219,7 @@ public class LevelBehavior : MonoBehaviour
         CurrentBoard.Behavior.SpinEnd -= OnSpinEnd;
     }
 
-    void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
+    private void OnNodeAffiliationChanged(BoardNodeAffiliation affiliation)
     {
         foreach (var node in CurrentBoard)
         {
@@ -238,40 +231,34 @@ public class LevelBehavior : MonoBehaviour
         }
 
         // Clean up resources
-        playing = false;
+        _playing = false;
         if (GameEnd != null)
         {
             GameEnd();
         }
     }
 
-    void OnNodeSwipeOccurred(NodeButtonBehavior down, NodeButtonBehavior up, Vector2 dir)
+    private void OnNodeSwipeOccurred(NodeButtonBehavior down, NodeButtonBehavior up, Vector2 dir)
     {
         var fromNode = CurrentBoard.GetOffsetNode(down.XIndex, down.YIndex);
         var toNode = CurrentBoard.GetOffsetNode(up.XIndex, up.YIndex);
 
-        if (fromNode != null && toNode != null)
-        {
-            float dist = Vector2.Distance(fromNode.Behavior.transform.position, toNode.Behavior.transform.position);
-            if (dist <= 1.25f)
-            {
-                fromNode.SendEnergy(toNode);
-                EnergyTransferCount++;
-            }
-        }
+        if (fromNode == null || toNode == null) return;
+        var dist = Vector2.Distance(fromNode.Behavior.transform.position, toNode.Behavior.transform.position);
+        if (!(dist <= 1.25f)) return;
+        fromNode.SendEnergy(toNode);
+        EnergyTransferCount++;
     }
 
-    void OnSwipeOccurred(Vector2 dir)
+    private void OnSwipeOccurred(Vector2 dir)
     {
         CurrentBoard.Behavior.Spin(dir);
-        if (downButton != null)
-        {
-            downButton.Deselect();
-            downButton = null;
-        }
+        if (_downButton == null) return;
+        _downButton.Deselect();
+        _downButton = null;
     }
 
-    void OnSpinEnd()
+    private void OnSpinEnd()
     {
         BoardTurnCount++;
     }
