@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
 public class BoardEditor : EditorWindow
 {
@@ -26,6 +28,15 @@ public class BoardEditor : EditorWindow
 	private List<EditorBoardNodeBehavior> _editNodes;
 	private bool _sceneOrtho;
 
+    private static TestingLevelController _levelController
+    {
+        get
+        {
+            var levelObj = GameObject.Find("LevelBehavior");
+            return levelObj != null ? levelObj.GetComponent<TestingLevelController>() : null;
+        }
+    }
+
     private enum BoardEditorTabState
     {
         Nodes,
@@ -38,6 +49,11 @@ public class BoardEditor : EditorWindow
     {
         var window = (BoardEditor)EditorWindow.GetWindow(typeof(BoardEditor));
         window.name = "Board Editor";
+
+        if (_levelController == null)
+        {
+            Debug.LogWarning("No TestingLevelController in scene. Testing is disabled.");
+        }
         window.Show();
     }
 
@@ -58,6 +74,18 @@ public class BoardEditor : EditorWindow
     private void OnGUI()
     {
 		SetupListeners ();
+
+        if (EditorApplication.isPlaying)
+        {
+            if (!GUILayout.Button("Stop Test")) return;
+            EditorApplication.isPlaying = false;
+
+            if (_storedData == null) return;
+            LoadBoard(_storedData);
+            _storedData = null;
+
+            return;
+        }
 
         // Can only call GUI functions from inside OnGUI
         _whiteText = new GUIStyle(GUI.skin.button) {normal = {textColor = new Color(.9f, .9f, .9f)}};
@@ -264,6 +292,9 @@ public class BoardEditor : EditorWindow
     {
         if (GUILayout.Button("Test"))
         {
+            _storedData = _boardData;
+            _boardData = null;
+            DestorySceneBoard();
             EditorApplication.isPlaying = true;
         }
     }
@@ -334,17 +365,25 @@ public class BoardEditor : EditorWindow
     {
         _boardData = data;
         CreateSceneBoard();
+        if (_levelController != null)
+        {
+            _levelController.TestBoard = _boardData;
+        }
     }
 
     private void UnloadBoard()
     {
         _boardData = null;
-        destorySceneBoard();
+        DestorySceneBoard();
+        if (_levelController != null)
+        {
+            _levelController.TestBoard = null;
+        }
     }
 
     private void ReloadScene()
     {
-        destorySceneBoard();
+        DestorySceneBoard();
         CreateSceneBoard();
     }
 
@@ -356,7 +395,7 @@ public class BoardEditor : EditorWindow
         _editNodes = new List<EditorBoardNodeBehavior> ();
         var nodes = _boardData.Nodes;
         // Create edit nodes
-        for (int i=0; i<nodes.Count; i++)
+        for (var i=0; i<nodes.Count; i++)
         {
             var obj = new GameObject();
             obj.transform.SetParent(boardParent.transform);
@@ -417,7 +456,7 @@ public class BoardEditor : EditorWindow
 		}
 	}
 
-    private static void destorySceneBoard()
+    private static void DestorySceneBoard()
     {
         var boardParent = GameObject.Find("BoardParent");
         var destoryList = new List<GameObject>();

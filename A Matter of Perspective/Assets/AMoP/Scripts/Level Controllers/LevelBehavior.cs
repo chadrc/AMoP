@@ -211,7 +211,7 @@ public class LevelBehavior : MonoBehaviour
         }
     }
 
-    private void Start()
+    protected void Start()
     {
         // UI Events
         EnergyPoolManager = new EnergyPoolManager(_energyFactory);

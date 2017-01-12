@@ -6,6 +6,12 @@ public class TestingLevelController : LevelBehavior
 {
     public BoardData TestBoard;
 
+    private new void Start()
+    {
+        base.Start();
+        Invoke("StartGame", 3.0f);
+    }
+
     public override void StartGame()
     {
         if (TestBoard == null)
