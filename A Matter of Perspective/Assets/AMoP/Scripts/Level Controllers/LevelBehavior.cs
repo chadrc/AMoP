@@ -36,7 +36,7 @@ public class LevelBehavior : MonoBehaviour
         get
         {
             var boardSeries = GameData.SeriesList.GetSeries(_boardSeriesIndex);
-            return _startingBoardIndex+1 < boardSeries.Count;
+            return !(boardSeries == null ||_startingBoardIndex+1 < boardSeries.Count);
         }
     }
     public bool HasNextSeries { get { return _boardSeriesIndex + 1 < GameData.SeriesList.Count; } }
