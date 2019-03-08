@@ -1,0 +1,32 @@
+﻿<Properties StartupConfiguration="{2C8A988B-E0B9-E696-2ADF-A3DF4D484EBB}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/AMoP/Scripts/Level Controllers/LevelBehavior.cs">
+    <Files>
+      <File FileName="Assets/AMoP/Scripts/Level Controllers/LevelBehavior.cs" Line="106" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="A Matter of Perspective" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="AMoP" expanded="True">
+                <Node name="Scripts" expanded="True">
+                  <Node name="Level Controllers" expanded="True">
+                    <Node name="LevelBehavior.cs" selected="True" />
+                  </Node>
+                  <Node name="Utils" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
